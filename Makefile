@@ -6,9 +6,9 @@
 # the PATH
 
 
-NAME := *{}
-SCRIPT := $(shell python -c "from setup import SCRIPT; print SCRIPT")
-VERSION := $(shell python -c "from ${NAME} import __version__; print __version__")
+NAME := genesis
+RELEASE := $(shell python -c "from ${NAME} import RELEASE; print(RELEASE)")
+SCRIPT := $(shell python -c "from setup import SCRIPT; print(SCRIPT)")
 
 
 clean:
@@ -30,29 +30,34 @@ profile:
 .PHONY: profile
 
 
+tests:
+	python -m unittest discover -v .
+.PHONY: tests
+
+
 sdist:
-	rm -rf dist/${NAME}-${VERSION}.* build
+	rm -rf dist/${NAME}-${RELEASE}.* build
 	python setup.py --quiet sdist
 	rm -rf ${NAME}.egg-info
 .PHONY: sdist
 
 
 register:
-	rm -rf dist/${NAME}-${VERSION}.* build
+	rm -rf dist/${NAME}-${RELEASE}.* build
 	python setup.py --quiet sdist register
 	rm -rf ${NAME}.egg-info
 .PHONY: register
 
 
 upload:
-	rm -rf dist/${NAME}-${VERSION}.* build
+	rm -rf dist/${NAME}-${RELEASE}.* build
 	python setup.py --quiet sdist register upload
 	rm -rf ${NAME}.egg-info
 .PHONY: upload
 
 
 py2exe:
-	rm -rf dist/${NAME}-${VERSION}.* build
+	rm -rf dist/${NAME}-${RELEASE}.* build
 	python setup.py --quiet py2exe
 	rm -rf ${NAME}.egg-info
 .PHONY: py2exe

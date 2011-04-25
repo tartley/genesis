@@ -5,10 +5,8 @@ from pprint import pprint
 import sys
 
 
-NAME = 'G{NAME}'
-version_module = __import__('version.py' % (NAME,))
-VERSION= version_module.VERSION
-RELEASE = version_module.RELEASE
+NAME = 'genesis'
+from genesis import RELEASE, VERSION
 
 SCRIPT = None
 CONSOLE = False
@@ -51,13 +49,13 @@ def get_sdist_config():
         version=RELEASE,
         description=description,
         long_description=long_description,
-        url='http://bitbucket.org/tartley/gloopy',
+        url='http://bitbucket.org/tartley/genesis',
         license='New BSD',
         author='Jonathan Hartley',
         author_email='tartley@tartley.com',
-        keywords='opengl 3d graphics games',
+        keywords='Python project template',
         packages=find_packages(exclude=('*.tests',)),
-        data_files=get_data_files('share/doc/gloopy', 'docs/html'),
+        data_files=get_data_files('share/doc/%s' % (NAME,), 'docs/html'),
         package_data={
             NAME:
                 get_package_data('data') +
