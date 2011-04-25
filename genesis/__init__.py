@@ -1,4 +1,4 @@
 
 VERSION = '0.1'
-RELEASE = VERSION + '.dev'
+RELEASE = VERSION + 'dev'
 

@@ -7,6 +7,9 @@ your project's name, the project author's name, etc.
 One standard project template is provided built-in to Genesis, but you can
 also supply your own.
 
+Note that this README describes some features which are not yet implemented.
+
+
 Dependencies
 ------------
 
@@ -21,15 +24,15 @@ Usage
 
     genesis <options> <projectname>
 
-This creates a directory named 'projectname' if it doesn't already exist,
-containing your new project. <options> may include::
+This creates a directory named *projectname*, if it doesn't already exist,
+containing your new project. <Options> may include::
 
     --template=T
         T defaults to 'default', or accepts the name of any template directory
         in your ~/.genesis directory.
     --license=L
-        Determines what LICENSE.txt file to create. L defaults to bsd, or
-        accepts apache, bsd, gpl, lgpg, mit, python.
+        Determines what LICENSE.txt file to create. Valid values of L include
+        apache, bsd (default), gpl, lgpg, mit, python.
     --txt-extension=.txt
         Defaults to .txt on Windows, nothing otherwise.
 
@@ -37,13 +40,13 @@ containing your new project. <options> may include::
         All specified flags are used to search-and-replace for template tags
         in the template files. See section 'Templates.'
 
-See the section 'Config file' to save you having to type these on the
+See the section *Config file* to save you having to type these on the
 command-line every time.
 
-Values can be specified either as --foo=bar or as --foo bar.
+Values can be specified either as ``--foo=bar`` or as ``--foo bar``.
 
-Minuses and underscores in the name of command-line flags are equivalent, e.g.
-Use either --txt-extensions or --txt_extensions.
+Minuses and underscores in the name of command-line flags are equivalent. E.g.
+``--txt-extensions`` and ``--txt_extensions`` are equivalent.
 
 
 Config file
@@ -134,8 +137,7 @@ Known Issues
 
 Very early in development - nothing works yet.
 
-Assumes your project is BSD license, which it puts into your project's
-LICENSE.txt file.
+Assumes your project is BSD license.
 
 
 Thanks
