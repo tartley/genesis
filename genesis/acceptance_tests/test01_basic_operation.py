@@ -1,6 +1,8 @@
 
 from os import chdir, getcwd
-from os.path import dirname, exists, expanduser, isdir, isfile, join, normpath
+from os.path import (
+    dirname, exists, expanduser, isdir, isfile, join, normpath, relpath
+)
 from shutil import copytree, rmtree
 from subprocess import Popen
 from sys import executable
@@ -12,6 +14,11 @@ from genesis.paths import CONFIG
 
 TEST_TEMPLATE = 'genesisTestTemplate'
 TEST_DIR = dirname(__file__)
+
+
+def read_file(filename):
+    with open(filename) as fp:
+        return fp.read()
 
 
 class Basic_operation(TestCase):
@@ -36,11 +43,13 @@ class Basic_operation(TestCase):
 
         # cd back to original cwd and rm the temp directory
         chdir(self.orig_cwd)
-        rmtree(self.temp_dir)
+        # rmtree(self.temp_dir)
 
 
     def run_genesis(self, *params):
-        script = join(dirname(__file__), '..', '..', 'genesis-script.py')
+        script = normpath(
+            join(dirname(__file__), '..', '..', 'genesis-script.py')
+        )
         command = [ executable, script ] + list(params)
         process = Popen(command)
         self.assertEqual(process.wait(), 0)
@@ -49,6 +58,7 @@ class Basic_operation(TestCase):
     def test_template_is_copied_and_tags_expanded(self):
         self.run_genesis(
             '--template=%s' % (TEST_TEMPLATE,),
+            '--author=Jonathan Hartley',
             'myproj'
         )
 
@@ -61,6 +71,30 @@ class Basic_operation(TestCase):
         self.assertTrue( isdir( join(myproj_dir, 'dir1') ) )
         self.assertTrue( isfile( join(myproj_dir, 'dir1', 'file2') ) )
 
-        # file1 has had G{name} replaced by 'myproj', as was specified on
-        # the command-line
+        # file1 has had G{name} replaced by 'myproj',
+        # and 'G{author} replaced by 'Jonathan Hartley',
+        # as were specified on the command-line
+        x = read_file(join(myproj_dir, 'file1'))
+        self.assertEqual(
+            read_file(join(myproj_dir, 'file1')),
+            (
+                'Project name: myproj\n'
+                'Author name: Jonathan Hartley\n'
+            )
+        )
+
+    def DONTtests_should_use_fake_config_dir_instead_of_copying_a_test_template(self):
+        self.fail()
+
+    def DONTtest_list_option_lists_tags_in_template(self):
+        self.fail()
+
+    def DONTtest_force_arg_to_overwrite_non_empty_dirs(self):
+        self.fail()
+
+    def DONTtest_accept_minuses_or_underscores(self):
+        # If you want something to display as 'pos-arg1' and be stored as
+        # 'pos_arg1', you should use
+        # add_argument('pos_arg1', metavar='pos-arg1')
+        pass
 

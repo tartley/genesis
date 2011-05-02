@@ -42,6 +42,9 @@ In addition, the following command-line options also have special meanings:
         What license to use for your new project. This determines what
         LICENSE.txt file to create. Valid values of L include the name of any
         file stored in your '~/.genesis/licenses' directory.
+    --force
+        Required to create a new project in a non-empty directory, overwriting
+        any files or dirs with the same name as template content.
 
 See the section *Config file* to set default values for command line flags.
 
