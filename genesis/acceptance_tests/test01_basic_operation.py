@@ -29,6 +29,7 @@ class Basic_operation(TestCase):
             rmtree(dest)
         copytree(source, dest)
 
+
     def tearDown(self):
         # rm the test template
         rmtree( join(CONFIG, TEST_TEMPLATE) )
@@ -37,6 +38,7 @@ class Basic_operation(TestCase):
         chdir(self.orig_cwd)
         rmtree(self.temp_dir)
 
+
     def run_genesis(self, *params):
         script = join(dirname(__file__), '..', '..', 'genesis-script.py')
         command = [ executable, script ] + list(params)
@@ -44,8 +46,11 @@ class Basic_operation(TestCase):
         self.assertEqual(process.wait(), 0)
 
 
-    def test_template_is_copied(self):
-        self.run_genesis('--template=%s' % (TEST_TEMPLATE,), 'myproj')
+    def test_template_is_copied_and_tags_expanded(self):
+        self.run_genesis(
+            '--template=%s' % (TEST_TEMPLATE,),
+            'myproj'
+        )
 
         # genesis creates a 'myproj' dir
         myproj_dir = join(self.temp_dir, 'myproj')
@@ -56,4 +61,6 @@ class Basic_operation(TestCase):
         self.assertTrue( isdir( join(myproj_dir, 'dir1') ) )
         self.assertTrue( isfile( join(myproj_dir, 'dir1', 'file2') ) )
 
+        # file1 has had G{name} replaced by 'myproj', as was specified on
+        # the command-line
 

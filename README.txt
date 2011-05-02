@@ -4,7 +4,7 @@ When invoked, it copies files and directories from a project template,
 doing several search-and-replace operations on the copied files to insert
 your project's name, the project author's name, etc.
 
-One standard project template is provided built-in to Genesis, but you can
+One default project template is provided built-in to Genesis, but you can
 also supply your own.
 
 Note that this README describes some features which are not yet implemented.
@@ -25,23 +25,25 @@ Usage
     genesis <options> <projectname>
 
 This creates a directory named *projectname*, if it doesn't already exist,
-containing your new project. <Options> may include::
-
-    --template=T
-        T defaults to 'default', or accepts the name of any template directory
-        in your ~/.genesis directory.
-    --license=L
-        Determines what LICENSE.txt file to create. Valid values of L include
-        apache, bsd (default), gpl, lgpg, mit, python.
-    --txt-extension=.txt
-        Defaults to .txt on Windows, nothing otherwise.
+containing your new project. <Options> may include any name-value pair:
 
     --ANYTHING=VALUE
-        All specified flags are used to search-and-replace for template tags
-        in the template files. See section 'Templates.'
+        All such options are used to search and replace in the content and
+        filenames of copied template files. For example, any occurrence of
+        'G{ANYTHING}' within the template files will be replaced with 'VALUE'.
+        See section 'Templates.'
 
-See the section *Config file* to save you having to type these on the
-command-line every time.
+In addition, the following command-line options also have special meanings:
+
+    --template=T
+        Template to use. T defaults to 'default'. Valid values are the name of
+        any template directory stored within your '~/.genesis' directory.
+    --license=L
+        What license to use for your new project. This determines what
+        LICENSE.txt file to create. Valid values of L include the name of any
+        file stored in your '~/.genesis/licenses' directory.
+
+See the section *Config file* to set default values for command line flags.
 
 Values can be specified either as ``--foo=bar`` or as ``--foo bar``.
 
@@ -73,8 +75,6 @@ When Genesis copies a template, it replaces any occurences of ``G{foo-bar}``,
 known as a `template tag`, with the value specified in command-line flag
 ``--foo-bar=X``, or by the value of ``foo_bar='X'`` assigned in your config
 file. Values from the command-line override the config file.
-
-Occurrences of template tags in file or directory names are also replaced.
 
 A warning is issued for any template tag for which neither the config file
 nor the command-line specify a value.
