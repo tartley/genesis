@@ -43,7 +43,7 @@ class Basic_operation(TestCase):
 
         # cd back to original cwd and rm the temp directory
         chdir(self.orig_cwd)
-        # rmtree(self.temp_dir)
+        rmtree(self.temp_dir)
 
 
     def run_genesis(self, *params):
@@ -80,6 +80,7 @@ class Basic_operation(TestCase):
             (
                 'Project name: myproj\n'
                 'Author name: Jonathan Hartley\n'
+                '\n'
             )
         )
 

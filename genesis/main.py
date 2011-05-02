@@ -19,18 +19,42 @@ def parse_known_args():
     return parser.parse_known_args()
 
 
-def parse_remaining_args(options, remaining_args):
+def parse_positional_args(options, args):
     '''
     Parse positional args and args with unknown names, which should be used to
     define template tags.
     '''
     # parse the only positional arg, project name
-    positional_args = [
-        arg for arg in remaining_args
-        if not arg.startswith('-')
-    ]
-    assert len(positional_args) == 1
-    options.name = positional_args[0]
+    for arg in args:
+        if not arg.startswith('-'):
+            args.remove(arg)
+            assert not hasattr(options, 'name')
+            options.name = arg
+
+    return options, args
+
+
+def parse_remaining_args(options, args):
+    '''
+    Any remaining args, unrecognized by argparse parser, have been specified by
+    the user to be used as search-and-replace terms on the tags within the
+    project template.
+    '''
+    while args:
+        arg = args.pop(0)
+        assert arg.startswith('--')
+        arg = arg[2:]
+        split = arg.find('=')
+        if split > -1:
+            key = arg[:split]
+            value = arg[split + 1:]
+        else:
+            key = arg
+            value = ''
+            if args:
+                value = args.pop(0)
+                assert not value.startswith('-')
+        setattr(options, key, value)
 
     return options
 
@@ -39,8 +63,13 @@ def parse_args():
     '''
     Parse command-line args, returned in an argparse.Namespace object.
     '''
-    options, remaining_args = parse_known_args()
-    return parse_remaining_args(options, remaining_args)
+    return (
+        parse_remaining_args(
+            *parse_positional_args(
+                *parse_known_args()
+            )
+        )
+    )
 
 
 def create_dest_dir(name):
@@ -53,7 +82,7 @@ def create_dest_dir(name):
     os.mkdir(name)
 
 
-def copy_tree(source, dest):
+def copy_tree(source, dest, options):
 
     def get_relative_path(root, name):
         return root[len(name):].strip(sep)
@@ -71,7 +100,15 @@ def copy_tree(source, dest):
             os.mkdir(name)
 
     def copy_file(source, dest):
-        copyfile(source, dest)
+        '''
+        Copy file source to destination, replacing template tags as we copy.
+        '''
+        with open(source) as source_fp:
+            with open(dest, 'w') as dest_fp:
+                content = source_fp.read()
+                for name, value in vars(options).items():
+                    content = content.replace('G{' + name + '}', value)
+                dest_fp.write(content)
 
     for dirname, subdirs, files in os.walk(source):
         relative_path = get_relative_path(dirname, source)
@@ -84,9 +121,9 @@ def copy_tree(source, dest):
             )
 
 
-def create_project( options ):
+def create_project(options):
     create_dest_dir(options.name)
-    copy_tree( join(CONFIG, options.template), options.name)
+    copy_tree( join(CONFIG, options.template), options.name, options)
 
 
 def main():
