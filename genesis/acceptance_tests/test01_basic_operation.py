@@ -12,7 +12,7 @@ from unittest import TestCase
 from genesis.paths import CONFIG
 
 
-TEST_TEMPLATE = 'genesisTestTemplate'
+TEST_TEMPLATE = 'testTemplate'
 TEST_DIR = dirname(__file__)
 
 
@@ -77,18 +77,20 @@ class Basic_operation(TestCase):
             )
         )
 
-    def DONTtests_should_use_fake_config_dir_instead_of_copying_a_test_template(self):
-        self.fail()
+        # file2 has had G{author_email} replaced by 'tartley@tartley.com',
+        # as specified in the config file
+        self.assertEqual(
+            read_file(join(myproj_dir, 'dir1', 'file2')),
+            (
+                'Author email: tartley@tartley.com\n'
+                '\n'
+            )
+        )
 
-    def DONTtest_list_option_lists_tags_in_template(self):
+
+    def DONTtest_list_unreplaced_tags(self):
         self.fail()
 
     def DONTtest_force_arg_to_overwrite_non_empty_dirs(self):
         self.fail()
-
-    def DONTtest_accept_minuses_or_underscores(self):
-        # If you want something to display as 'pos-arg1' and be stored as
-        # 'pos_arg1', you should use
-        # add_argument('pos_arg1', metavar='pos-arg1')
-        pass
 
