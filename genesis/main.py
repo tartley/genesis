@@ -82,7 +82,7 @@ def create_dest_dir(name):
     os.mkdir(name)
 
 
-def copy_tree(source, dest, options):
+def copy_tree(source, dest, transform):
 
     def get_relative_path(root, name):
         return root[len(name):].strip(sep)
@@ -105,10 +105,7 @@ def copy_tree(source, dest, options):
         '''
         with open(source) as source_fp:
             with open(dest, 'w') as dest_fp:
-                content = source_fp.read()
-                for name, value in vars(options).items():
-                    content = content.replace('G{' + name + '}', value)
-                dest_fp.write(content)
+                dest_fp.write( transform( source_fp.read() ) )
 
     for dirname, subdirs, files in os.walk(source):
         relative_path = get_relative_path(dirname, source)
@@ -122,8 +119,14 @@ def copy_tree(source, dest, options):
 
 
 def create_project(options):
+
+    def transform(content):
+        for name, value in vars(options).items():
+            content = content.replace('G{' + name + '}', value)
+        return content
+
     create_dest_dir(options.name)
-    copy_tree( join(CONFIG, options.template), options.name, options)
+    copy_tree( join(CONFIG, options.template), options.name, transform)
 
 
 def main():
