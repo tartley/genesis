@@ -53,9 +53,6 @@ def copy_tree(source, dest, transform):
 
 
 def create_project(options):
-    if options.config_dir:
-        paths.CONFIG = options.config_dir
-
     def transform(content):
         for name, value in vars(options).items():
             content = content.replace('G{' + name + '}', value)
