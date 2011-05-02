@@ -5,7 +5,7 @@ from os.path import abspath, exists, isdir, isfile, join, sep
 from shutil import copyfile
 import sys
 
-from .paths import CONFIG
+from . import paths
 
 
 def parse_known_args():
@@ -16,6 +16,7 @@ def parse_known_args():
         description='Create a new Python project.'
     )
     parser.add_argument('--template', type=str, help='Project template to use.')
+    parser.add_argument('--config-dir', type=str, help='Genesis config directory, defaults to ~/.genesis. This option is only useful for testing Genesis itself.')
     return parser.parse_known_args()
 
 
@@ -119,6 +120,8 @@ def copy_tree(source, dest, transform):
 
 
 def create_project(options):
+    if options.config_dir:
+        paths.CONFIG = options.config_dir
 
     def transform(content):
         for name, value in vars(options).items():
@@ -126,7 +129,7 @@ def create_project(options):
         return content
 
     create_dest_dir(options.name)
-    copy_tree( join(CONFIG, options.template), options.name, transform)
+    copy_tree( join(paths.CONFIG, options.template), options.name, transform)
 
 
 def main():

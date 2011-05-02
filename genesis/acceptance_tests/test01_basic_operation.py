@@ -29,18 +29,8 @@ class Basic_operation(TestCase):
         self.orig_cwd = getcwd()
         chdir(self.temp_dir)
 
-        # create the test template
-        source = join(TEST_DIR, TEST_TEMPLATE)
-        dest = join(CONFIG, TEST_TEMPLATE)
-        if exists(dest):
-            rmtree(dest)
-        copytree(source, dest)
-
 
     def tearDown(self):
-        # rm the test template
-        rmtree( join(CONFIG, TEST_TEMPLATE) )
-
         # cd back to original cwd and rm the temp directory
         chdir(self.orig_cwd)
         rmtree(self.temp_dir)
@@ -50,8 +40,11 @@ class Basic_operation(TestCase):
         script = normpath(
             join(dirname(__file__), '..', '..', 'genesis-script.py')
         )
-        command = [ executable, script ] + list(params)
-        process = Popen(command)
+        process = Popen(
+            [ executable, script ] +
+            [ '--config-dir=%s' % (join(TEST_DIR, 'testConfigDir'),) ] +
+            list(params)
+        )
         self.assertEqual(process.wait(), 0)
 
 
