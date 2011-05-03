@@ -1,6 +1,7 @@
 
 import argparse
-from os.path import join
+from os.path import isfile, join
+import sys
 
 from . import paths
 
@@ -8,16 +9,27 @@ from . import paths
 CONFIG_FILENAME = 'config'
 
 
-def parse_known_args():
+def create_parser():
     '''
-    Parse command-line args with known names.
+    Return parser for command-line args with known names.
     '''
     parser = argparse.ArgumentParser(
-        description='Create a new Python project.'
+        description='Create a new Python project.',
+        epilog="Plus arbitrary options of the form '--foo=bar', which are "
+            "used to search-and-replace tags such as 'G{foo}' in the "
+            "copied project template."
     )
-    parser.add_argument('--template', type=str, help='Project template to use.')
-    parser.add_argument('--config-dir', type=str, help='Genesis config directory, defaults to ~/.genesis. This option is only useful for testing Genesis itself.')
-    return parser.parse_known_args()
+    parser.add_argument(
+        '--template', type=str, default='default',
+        help='Project template to use.'
+    )
+    parser.add_argument(
+        '--config-dir', type=str,
+        help='Genesis config directory, defaults to ~/.genesis. '
+            'This option is only useful for testing Genesis itself.'
+    )
+    #parser.add_argument('name', type=str, help='Name of your new project')
+    return parser
 
 
 def parse_positional_args(options, args):
@@ -60,15 +72,32 @@ def parse_remaining_args(options, args):
     return options
 
 
+def parse_config_file(filename):
+    '''
+    Read the config file, return parsed values as a dict
+    '''
+    if not isfile(filename):
+        return {}
+
+    with open(filename) as fp:
+        source = fp.read()
+    config_vars = {}
+    exec(source, globals(), config_vars)
+    return config_vars
+
+
 class Options():
     '''
     Stores a dict of values such that they can be accessed as instance.key,
     instead of instance['key']
     '''
-    def __init__(self, d):
-        self.__dict__.update(d)
+    def __init__(self, d=None):
+        if d:
+            self.__dict__.update(d)
     def update(self, d):
         self.__dict__.update(d)
+    def __contains__(self, other):
+        return other in self.__dict__
     def __str__(self):
         return (
             '\n  '.join(
@@ -81,34 +110,31 @@ class Options():
             '\n}'
         )
 
-def parse_config_file(filename):
-    '''
-    Read the config file,
-    return an Options instance containing the parsed values.
-    '''
-    with open(filename) as fp:
-        source = fp.read()
-    config_vars = {}
-    exec(source, globals(), config_vars)
-    return Options(config_vars)
-
 
 def parse_args():
     '''
     Combine args from config file and command line into a single Options
     instance.
     '''
-    command_line_options = (
-        parse_remaining_args( *parse_positional_args( *parse_known_args() ) )
+    parser = create_parser()
+    command_line_opts = parse_remaining_args(
+        *parse_positional_args(
+            *parser.parse_known_args()
+        )
     )
 
     # command-line can override location of config dir
-    if command_line_options.config_dir:
-        paths.CONFIG = command_line_options.config_dir
-    config_file_options = parse_config_file(join(paths.CONFIG, CONFIG_FILENAME))
+    if command_line_opts.config_dir:
+        paths.CONFIG = command_line_opts.config_dir
+    config_file_opts = parse_config_file(join(paths.CONFIG, CONFIG_FILENAME))
 
     # command-line overrides config file
-    config_file_options.update(vars(command_line_options))
+    options = Options(config_file_opts)
+    options.update(vars(command_line_opts))
 
-    return config_file_options
+    if 'name' not in options:
+        parser.print_help()
+        sys.exit(2)
+
+    return options
 

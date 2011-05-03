@@ -36,7 +36,7 @@ class Basic_operation(TestCase):
         rmtree(self.temp_dir)
 
 
-    def run_genesis(self, *params):
+    def run_genesis(self, *params, exit_value=0):
         script = normpath(
             join(dirname(__file__), '..', '..', 'genesis-script.py')
         )
@@ -45,7 +45,7 @@ class Basic_operation(TestCase):
             [ '--config-dir=%s' % (join(TEST_DIR, 'testConfigDir'),) ] +
             list(params)
         )
-        self.assertEqual(process.wait(), 0)
+        self.assertEqual(process.wait(), exit_value)
 
 
     def test_template_is_copied_and_tags_expanded(self):
@@ -87,6 +87,14 @@ class Basic_operation(TestCase):
             )
         )
 
+    # TODO
+    # Putting 'name' positional arg into argparse parser uses the first
+    # unrecognised optional arg (e.g. --author) to populate it. Removing
+    # 'name' from argparse, to be handled by parse_positional_args, means it
+    # is missing from the auto-generated usage text.
+
+    def test_zero_args_shows_usage(self):
+        self.run_genesis(exit_value=2)
 
     def DONTtest_list_unreplaced_tags(self):
         self.fail()
