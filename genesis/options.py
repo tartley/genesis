@@ -14,62 +14,22 @@ def create_parser():
     Return parser for command-line args with known names.
     '''
     parser = argparse.ArgumentParser(
+        prog='genesis',
         description='Create a new Python project.',
-        epilog="Plus arbitrary options of the form '--foo=bar', which are "
-            "used to search-and-replace tags such as 'G{foo}' in the "
-            "copied project template."
     )
-    parser.add_argument(
-        '--template', type=str, default='default',
+    parser.add_argument('--template', default='default',
         help='Project template to use.'
     )
-    parser.add_argument(
-        '--config-dir', type=str,
+    parser.add_argument('--config-dir',
         help='Genesis config directory, defaults to ~/.genesis. '
-            'This option is only useful for testing Genesis itself.'
+            'This option is used for testing Genesis itself.'
     )
-    #parser.add_argument('name', type=str, help='Name of your new project')
+    parser.add_argument('name', nargs='+',
+        help='Name of your new project, followed by optional space-separated '
+            'name=value pairs.'
+    )
     return parser
 
-
-def parse_positional_args(options, args):
-    '''
-    Parse positional args and args with unknown names, which should be used to
-    define template tags.
-    '''
-    # parse the only positional arg, project name
-    for arg in args:
-        if not arg.startswith('-'):
-            args.remove(arg)
-            assert not hasattr(options, 'name')
-            options.name = arg
-
-    return options, args
-
-
-def parse_remaining_args(options, args):
-    '''
-    Any remaining args, unrecognized by argparse parser, have been specified by
-    the user to be used as search-and-replace terms on the tags within the
-    project template.
-    '''
-    while args:
-        arg = args.pop(0)
-        assert arg.startswith('--')
-        arg = arg[2:]
-        split = arg.find('=')
-        if split > -1:
-            key = arg[:split]
-            value = arg[split + 1:]
-        else:
-            key = arg
-            value = ''
-            if args:
-                value = args.pop(0)
-                assert not value.startswith('-')
-        setattr(options, key, value)
-
-    return options
 
 
 def parse_config_file(filename):
@@ -96,8 +56,11 @@ class Options():
             self.__dict__.update(d)
     def update(self, d):
         self.__dict__.update(d)
+    def __iter__(self):
+        return self.__dict__.iteritems()
     def __contains__(self, other):
-        return other in self.__dict__
+        return self.__dict__.__contains__(other)
+
     def __str__(self):
         return (
             '\n  '.join(
@@ -110,31 +73,63 @@ class Options():
             '\n}'
         )
 
+def extract_name(options, parser):
+    '''
+    Options.name contains list of tags, zero or more of which are name=value
+    pairs defining a tag, but exactly one of which is just a 'name', denoting
+    the project name that is to be created.
+    Remove the name from the list, & return (name, tags).
+    '''
+    if 'name' not in options:
+        sys.stderr.write('Project name not specified.')
+        parser.print_usage()
+        sys.exit(2)
+
+    names = [o for o in options.name if '=' not in o]
+    if len(names) == 0:
+        sys.stderr.write('Project name not specified.')
+        argparse.ArgumentParser.print_usage(parser)
+        sys.exit(2)
+    if len(names) > 1:
+        msg = 'More than one project name specified (%s)' % (', '.join(names),)
+        sys.stderr.write(msg)
+        argparse.ArgumentParser.print_usage(parser)
+        sys.exit(2)
+
+    options.name.remove(names[0])
+    return names[0], options.name
+
+
+def tags_to_dict(taglist):
+    tags = {}
+    for tag in taglist:
+        pos = tag.find('=')
+        tags[tag[:pos]] = tag[pos+1:]
+    return tags
+
 
 def parse_args():
     '''
     Combine args from config file and command line into a single Options
     instance.
     '''
-    parser = create_parser()
-    command_line_opts = parse_remaining_args(
-        *parse_positional_args(
-            *parser.parse_known_args()
-        )
-    )
+    opts_cmdline = Options()
 
-    # command-line can override location of config dir
-    if command_line_opts.config_dir:
-        paths.CONFIG = command_line_opts.config_dir
-    config_file_opts = parse_config_file(join(paths.CONFIG, CONFIG_FILENAME))
+    parser = create_parser()
+    parser.parse_args(namespace=opts_cmdline)
+    opts_cmdline.name, taglist = extract_name(opts_cmdline, parser)
+    opts_tags = tags_to_dict(taglist)
+
+    # command-line can override location of config file
+    if opts_cmdline.config_dir:
+        paths.CONFIG = opts_cmdline.config_dir
+
+    opts_file = parse_config_file(join(paths.CONFIG, CONFIG_FILENAME))
 
     # command-line overrides config file
-    options = Options(config_file_opts)
-    options.update(vars(command_line_opts))
-
-    if 'name' not in options:
-        parser.print_help()
-        sys.exit(2)
-
-    return options
+    result = Options()
+    result.update(opts_file)
+    result.update(opts_cmdline)
+    result.update(opts_tags)
+    return result
 

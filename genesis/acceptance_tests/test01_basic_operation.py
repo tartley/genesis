@@ -36,7 +36,7 @@ class Basic_operation(TestCase):
         rmtree(self.temp_dir)
 
 
-    def run_genesis(self, *params, exit_value=0):
+    def _run_genesis(self, *params):
         script = normpath(
             join(dirname(__file__), '..', '..', 'genesis-script.py')
         )
@@ -45,14 +45,22 @@ class Basic_operation(TestCase):
             [ '--config-dir=%s' % (join(TEST_DIR, 'testConfigDir'),) ] +
             list(params)
         )
-        self.assertEqual(process.wait(), exit_value)
+        return process.wait()
+
+    def run_genesis_ok(self, *params):
+        exitval = self._run_genesis(*params)
+        self.assertEqual(exitval, 0)
+
+    def run_genesis_fail(self, *params):
+        exitval = self._run_genesis(*params)
+        self.assertEqual(exitval, 2)
 
 
     def test_template_is_copied_and_tags_expanded(self):
-        self.run_genesis(
+        self.run_genesis_ok(
             '--template=%s' % (TEST_TEMPLATE,),
-            '--author=Jonathan Hartley',
-            'myproj'
+            'myproj',
+            'author=Jonathan Hartley',
         )
 
         # genesis creates a 'myproj' dir
@@ -67,7 +75,6 @@ class Basic_operation(TestCase):
         # file1 has had G{name} replaced by 'myproj',
         # and 'G{author} replaced by 'Jonathan Hartley',
         # as were specified on the command-line
-        x = read_file(join(myproj_dir, 'file1'))
         self.assertEqual(
             read_file(join(myproj_dir, 'file1')),
             (
@@ -94,7 +101,7 @@ class Basic_operation(TestCase):
     # is missing from the auto-generated usage text.
 
     def test_zero_args_shows_usage(self):
-        self.run_genesis(exit_value=2)
+        self.run_genesis_fail()
 
     def DONTtest_list_unreplaced_tags(self):
         self.fail()

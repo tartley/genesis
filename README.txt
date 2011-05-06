@@ -22,57 +22,71 @@ Usage
 
 ::
 
-    genesis <options> <projectname>
+    genesis [<options>] <projectname> [<name>=<value>...]
 
 This creates a directory named *projectname*, if it doesn't already exist,
-containing your new project. <Options> may include any name-value pair:
-
-    --ANYTHING=VALUE
-        All such options are used to search and replace in the content and
-        filenames of copied template files. For example, any occurrence of
-        'G{ANYTHING}' within the template files will be replaced with 'VALUE'.
-        See section 'Templates.'
-
-In addition, the following command-line options also have special meanings:
+containing your new project. <Options> may include any of:
 
     --template=T
         Template to use. T defaults to 'default'. Valid values are the name of
         any template directory stored within your '~/.genesis' directory.
-    --license=L
-        What license to use for your new project. This determines what
-        LICENSE.txt file to create. Valid values of L include the name of any
-        file stored in your '~/.genesis/licenses' directory.
     --force
         Required to create a new project in a non-empty directory, overwriting
         any files or dirs with the same name as template content.
 
-See the section *Config file* to set default values for command line flags.
+In addition, the command line can include any number of space-separated
+``name=value`` pairs, which are used to search-and-replace tags within the
+copied template of the form ``G{name}``.
 
-Values can be specified either as ``--foo=bar`` or as ``--foo bar``.
+For example, ``author_email=me@example.com`` on the command-line will cause
+``G{author_email}`` anywhere in the template to be replaced with
+'me@example.com' in the created project.
 
-Minuses and underscores in the name of command-line flags are equivalent. E.g.
-``--txt-extensions`` and ``--txt_extensions`` are equivalent.
+Minuses in the names of name=value pairs are treated as though they were
+underscores. E.g. ``author-email=X`` is treated like ``author_email=X``.
+
+``<Projectname>`` should not contain any equals characters - this is the only
+feature that distinguishes it from a ``name=value`` pair.
+
+
+Missing tag values
+------------------
+
+If the template contains any ``G{name}`` tags which do not have a value defined
+on the command-line nor in the config file, then a warning will be issued,
+e.g::
+
+    Undefined: G{name} in path/file.py, line 65
+
+The project that is created will still have the text ``G{name}`` in it at this
+location. To fix this, you should define a value for ``name`` either on the
+command line or in your config file. Then either delete the generated project
+directory and re-run genesis, or else just re-run it with the ``--force``
+command-line flag, so that it is forced to overwrite the previously generated
+project.
 
 
 Config file
 -----------
 
-To save having to type values such as ``--author=foo`` on the command-line
-every time, you can put them into config file ``~/.genesis/genesis.config``.
+The config file, ``~/.genesis/genesis.config``, is a Python3.2 syntax file,
+although it has no .py extension. In it values can be assigned to
+variables which behave just like flags or name-value pairs on the command-line.
 For example, a config file might contain::
 
+    template = 'my_favourite'
     author = 'Jonathan Hartley'
+    
+This is equivalent to specifying
+``--template=my_favourite author=Jonathan\ Hartley`` on the command-line.
 
-This is a Python3.2 syntax file (although it has no .py extension) in which you
-can assign a value to variables with the same name as any command-line flag.
-Minuses cannot be used in Python identifiers (on the left hand side of the
-equals sign), so use underscores instead.
+Minuses cannot be used in Python identifiers, so use underscores instead.
 
 
 Templates
 ---------
 
-Project templates are directories stored inside ``~/.genesis``.
+Project templates are directories inside ``~/.genesis``.
 
 When Genesis copies a template, it replaces any occurences of ``G{foo-bar}``,
 known as a `template tag`, with the value specified in command-line flag
@@ -135,10 +149,35 @@ The Makefile can be used on Windows by, for example, having Cygwin binaries
 on your PATH.
 
 
+Defining your own templates
+---------------------------
+
+Create a directory under ``~/.genesis``. Fill it with the files and directories
+you'd like to start your project with. Insert tags into the template files
+of the form ``G{name}``. Now you can create a new project using this template
+using::
+
+    genesis --template <mytemplate> <projectname>
+
+Where ``<mytemplate>`` is the name of the directory you created. To make this
+type of template the default, add a line to your config file::
+
+    template = '<mytemplate>'
+
+Now you need only issue the command-line::
+
+    genesis <projectname>
+
+
 Known Issues
 ------------
 
-Very early in development - nothing works yet.
+Very early in development:
+ - only very basic functionality works
+ - there is no default template
+
+The config file is parsed using 'eval'. I'm not smart enough to know whether
+this is a security problem.
 
 Assumes your project is BSD license.
 
