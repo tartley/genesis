@@ -51,16 +51,8 @@ class Options():
     Stores a dict of values such that they can be accessed as instance.key,
     instead of instance['key']
     '''
-    def __init__(self, d=None):
-        if d:
-            self.__dict__.update(d)
     def update(self, d):
         self.__dict__.update(d)
-    def __iter__(self):
-        return self.__dict__.iteritems()
-    def __contains__(self, other):
-        return self.__dict__.__contains__(other)
-
     def __str__(self):
         return (
             '\n  '.join(
@@ -113,10 +105,8 @@ def parse_args():
     Combine args from config file and command line into a single Options
     instance.
     '''
-    opts_cmdline = Options()
-
     parser = create_parser()
-    parser.parse_args(namespace=opts_cmdline)
+    opts_cmdline = parser.parse_args()
     opts_cmdline.name, taglist = extract_name(opts_cmdline, parser)
     opts_tags = tags_to_dict(taglist)
 
@@ -129,7 +119,7 @@ def parse_args():
     # command-line overrides config file
     result = Options()
     result.update(opts_file)
-    result.update(opts_cmdline)
+    result.update(vars(opts_cmdline))
     result.update(opts_tags)
     return result
 
