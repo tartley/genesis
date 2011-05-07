@@ -30,6 +30,7 @@ profile:
 .PHONY: profile
 
 
+test: tests
 tests:
 	python -m unittest discover -v .
 .PHONY: tests
