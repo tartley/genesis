@@ -1,19 +1,21 @@
 
-import os
+from os import listdir, mkdir, remove, walk
 from os.path import abspath, exists, isdir, isfile, join, sep
+from sys import exit, stderr
 
 from . import paths
 from .options import parse_args
 
 
 def create_dest_dir(name):
-    if not exists( name ):
-        os.mkdir(name)
-    #if listdir( options.name ):
-        #print(
-            #"Directory '%s' is not empty, use --force" % (options.name,),
-            #file=sys.stdout
-        #)
+    if not exists(name):
+        mkdir(name)
+    elif listdir(name):
+        print(
+            "Output directory '{}' is not empty, use --force".format(name),
+            file=stderr
+        )
+        exit(2)
 
 
 def copy_tree(source, dest, transform):
@@ -29,9 +31,9 @@ def copy_tree(source, dest, transform):
         '''
         name = abspath(name)
         if isfile(name):
-            os.remove(name)
+            remove(name)
         elif not isdir(name):
-            os.mkdir(name)
+            mkdir(name)
 
     def copy_file(source, dest):
         '''
@@ -41,7 +43,7 @@ def copy_tree(source, dest, transform):
             with open(dest, 'w') as dest_fp:
                 dest_fp.write( transform( source_fp.read() ) )
 
-    for dirname, subdirs, files in os.walk(source):
+    for dirname, subdirs, files in walk(source):
         relative_path = get_relative_path(dirname, source)
         for subdir in subdirs:
             make_dir(join(dest, relative_path, subdir))

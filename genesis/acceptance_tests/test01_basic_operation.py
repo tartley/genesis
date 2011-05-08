@@ -22,6 +22,9 @@ def read_file(filename):
     with open(filename) as fp:
         return fp.read()
 
+def str_decode(s):
+    return bytes(s).decode('unicode_escape')
+
 
 class Basic_operation(TestCase):
 
@@ -58,9 +61,9 @@ class Basic_operation(TestCase):
             'myproj',
             'author=Jonathan Hartley',
         )
-        self.assertEqual(exitval, 0)
-        self.assertEqual(out, b'')
-        self.assertEqual(err, b'')
+        self.assertEqual(err, b'', str_decode(err))
+        self.assertEqual(out, b'', str_decode(out))
+        self.assertEqual(exitval, 0, str_decode(err + out))
 
         # genesis creates a 'myproj' dir
         myproj_dir = join(self.temp_dir, 'myproj')
@@ -70,6 +73,14 @@ class Basic_operation(TestCase):
         self.assertTrue( isfile( join(myproj_dir, 'file1') ) )
         self.assertTrue( isdir( join(myproj_dir, 'dir1') ) )
         self.assertTrue( isfile( join(myproj_dir, 'dir1', 'file2') ) )
+
+
+    def assert_genesis_gives_error(self, *args, expected_err=None):
+        exitval, out, err = self.run_genesis(*args)
+        if expected_err:
+            self.assertTrue(expected_err in str(err), str_decode(err))
+        self.assertEqual(out, b'', str_decode(out))
+        self.assertEqual(exitval, 2, str_decode(err + out))
 
 
     def test_template_is_copied_and_tags_expanded(self):
@@ -99,14 +110,24 @@ class Basic_operation(TestCase):
         )
 
     def test_zero_args_shows_usage(self):
-        exitval, out, err = self.run_genesis()
-        self.assertEqual(exitval, 2)
-        self.assertEqual(out, b'')
-        self.assertTrue(b'usage:' in err)
+        self.assert_genesis_gives_error(expected_err='usage:')
+        # genesis has not created a 'myproj' dir
+        myproj_dir = join(self.temp_dir, 'myproj')
+        self.assertFalse( exists(myproj_dir) )
 
     def test_existing_empty_dir_is_filled(self):
         mkdir('myproj')
         self.assert_genesis_runs_ok()
+
+    def test_existing_full_dir_raises_an_error(self):
+        mkdir('myproj')
+        with open(join('myproj', 'somefile'), 'w') as fp:
+            pass
+        self.assert_genesis_gives_error(
+            '--template={}'.format(TEST_TEMPLATE),
+            'myproj',
+            'author=Jonathan Hartley',
+        )
 
     def DONTtest_list_unreplaced_tags(self):
         self.fail()
