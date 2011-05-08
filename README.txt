@@ -30,23 +30,27 @@ containing your new project. <Options> may include any of:
     --template=T
         Template to use. T defaults to 'default'. Valid values are the name of
         any template directory stored within your '~/.genesis' directory.
+    --license=L
+        Uses license file 'L' from ~/.genesis/licenses. Also useful as a
+        template tag: ``G{license}`` anywhere else in your template will be
+        replaced with the name of your license.
     --force
         Required to create a new project in a non-empty directory, overwriting
         any files or dirs with the same name as template content.
+    --config-dir=C
+        Use C as your config dir instead of ~/.genesis. Used for testing
+        Genesis itself during development.
 
 In addition, the command line can include any number of space-separated
-``name=value`` pairs, which are used to search-and-replace tags within the
-copied template of the form ``G{name}``.
+``name=value`` pairs, which are used to search-and-replace tags of the form
+``G{name}`` within the copied template.
 
 For example, ``author_email=me@example.com`` on the command-line will cause
 ``G{author_email}`` anywhere in the template to be replaced with
 'me@example.com' in the created project.
 
-Minuses in the names of name=value pairs are treated as though they were
-underscores. E.g. ``author-email=X`` is treated like ``author_email=X``.
-
 ``<Projectname>`` should not contain any equals characters - this is the only
-feature that distinguishes it from a ``name=value`` pair.
+feature that distinguishes it from ``name=value`` pairs.
 
 
 Missing tag values
@@ -80,25 +84,10 @@ For example, a config file might contain::
 This is equivalent to specifying
 ``--template=my_favourite author=Jonathan\ Hartley`` on the command-line.
 
-Minuses cannot be used in Python identifiers, so use underscores instead.
+Values in the config file are overriden by the command-line.
 
-
-Templates
----------
-
-Project templates are directories inside ``~/.genesis``.
-
-When Genesis copies a template, it replaces any occurences of ``G{foo-bar}``,
-known as a `template tag`, with the value specified in command-line flag
-``--foo-bar=X``, or by the value of ``foo_bar='X'`` assigned in your config
-file. Values from the command-line override the config file.
-
-A warning is issued for any template tag for which neither the config file
-nor the command-line specify a value.
-
-Minuses and underscores are equivalent in the name of template tags. E.g.
-when Genesis searches-and-replaces 'G{foo-bar}', it also searches and replaces
-'G{foo_bar}' at the same time.
+If your template contains tags with names which are not valid Python variable
+names, you will not be able to specify those tags' values in the config file.
 
 
 The Default Project Template
@@ -145,8 +134,7 @@ also supports the following targets:
   profile
     Requires RunSnakeRun, see Makefile for details.
 
-The Makefile can be used on Windows by, for example, having Cygwin binaries
-on your PATH.
+The Makefile can be used on Windows by having Cygwin binaries on your PATH.
 
 
 Defining your own templates
@@ -172,20 +160,25 @@ Now you need only issue the command-line::
 Known Issues
 ------------
 
-Very early in development:
- - only very basic functionality works
- - there is no default template
+There is no default template.
+
+Undefined tag values are not reported.
+
+--license not implemented. Assumes your project is BSD license.
+
+Not actually tested on Ubuntu
+
+No binaries are available, which makes Genesis unusable unless you use Python
+3.2.
 
 The config file is parsed using 'eval'. I'm not smart enough to know whether
 this is a security problem.
-
-Assumes your project is BSD license.
 
 
 Thanks
 ------
 
-The modest contents of this directory owe much to Tarek Ziadé's excellent book
-`Expert Python Programming`, which improved the way I work with Python every
-day.
+The modest contents of this directory owe much to Tarek Ziadé's highly
+recommended book `Expert Python Programming`, which improved the way I work
+with Python every day.
 
