@@ -20,6 +20,9 @@ def create_parser():
     parser.add_argument('--template', default='default',
         help='Project template to use.'
     )
+    parser.add_argument('--force', action='store_true', default=False,
+        help='Force writing to an existing non-empty output dir.'
+    )
     parser.add_argument('--config-dir',
         help='Genesis config directory, defaults to ~/.genesis. '
             'This option is used for testing Genesis itself.'

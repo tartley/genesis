@@ -7,12 +7,14 @@ from . import paths
 from .options import parse_args
 
 
-def create_dest_dir(name):
-    if not exists(name):
-        mkdir(name)
-    elif listdir(name):
+def create_dest_dir(options):
+    if not exists(options.name):
+        mkdir(options.name)
+    elif listdir(options.name) and not options.force:
         print(
-            "Output directory '{}' is not empty, use --force".format(name),
+            "Output directory '{}' is not empty, use --force".format(
+                options.name
+            ),
             file=stderr
         )
         exit(2)
@@ -57,10 +59,10 @@ def copy_tree(source, dest, transform):
 def create_project(options):
     def transform(content):
         for name, value in vars(options).items():
-            content = content.replace('G{' + name + '}', value)
+            content = content.replace('G{' + name + '}', str(value))
         return content
 
-    create_dest_dir(options.name)
+    create_dest_dir(options)
     copy_tree( join(paths.CONFIG, options.template), options.name, transform)
 
 

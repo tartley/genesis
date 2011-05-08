@@ -55,12 +55,8 @@ class Basic_operation(TestCase):
         return process.returncode, out, err
 
 
-    def assert_genesis_runs_ok(self):
-        exitval, out, err = self.run_genesis(
-            '--template={}'.format(TEST_TEMPLATE),
-            'myproj',
-            'author=Jonathan Hartley',
-        )
+    def assert_genesis_runs_ok(self, *args):
+        exitval, out, err = self.run_genesis(*args)
         self.assertEqual(err, b'', str_decode(err))
         self.assertEqual(out, b'', str_decode(out))
         self.assertEqual(exitval, 0)
@@ -86,7 +82,11 @@ class Basic_operation(TestCase):
 
 
     def test_template_is_copied_and_tags_expanded(self):
-        self.assert_genesis_runs_ok()
+        self.assert_genesis_runs_ok(
+            '--template={}'.format(TEST_TEMPLATE),
+            'myproj',
+            'author=Jonathan Hartley',
+        )
 
         # file1 has had G{name} replaced by 'myproj',
         # and 'G{author} replaced by 'Jonathan Hartley',
@@ -120,7 +120,11 @@ class Basic_operation(TestCase):
 
     def test_existing_empty_dir_is_filled(self):
         mkdir('myproj')
-        self.assert_genesis_runs_ok()
+        self.assert_genesis_runs_ok(
+            '--template={}'.format(TEST_TEMPLATE),
+            'myproj',
+            'author=Jonathan Hartley',
+        )
 
 
     def test_existing_full_dir_raises_an_error(self):
@@ -132,6 +136,18 @@ class Basic_operation(TestCase):
             'myproj',
             'author=Jonathan Hartley',
             expected_err="Output directory 'myproj' is not empty, use --force",
+        )
+
+
+    def test_existing_full_dir_with_force_param_should_be_written_to(self):
+        mkdir('myproj')
+        with open(join('myproj', 'somefile'), 'w') as fp:
+            pass
+        self.assert_genesis_runs_ok(
+            '--template={}'.format(TEST_TEMPLATE),
+            '--force',
+            'myproj',
+            'author=Jonathan Hartley',
         )
 
 
