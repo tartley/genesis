@@ -8,6 +8,7 @@ One default project template is provided built-in to Genesis, but you can
 also supply your own.
 
 Note that this README describes some features which are not yet implemented.
+See 'Known Issues' below.
 
 
 Dependencies
@@ -60,14 +61,14 @@ If the template contains any ``G{name}`` tags which do not have a value defined
 on the command-line nor in the config file, then a warning will be issued,
 e.g::
 
-    Undefined: G{name} in path/file.py, line 65
+    Undefined: G{license} in path/file.py, line 65
 
-The project that is created will still have the text ``G{name}`` in it at this
-location. To fix this, you should define a value for ``name`` either on the
-command line or in your config file. Then either delete the generated project
-directory and re-run genesis, or else just re-run it with the ``--force``
-command-line flag, so that it is forced to overwrite the previously generated
-project.
+The project that is created will still have the text ``G{license}`` in it at
+this location. To fix this, you should define a value for ``license`` either on
+the command line or in your config file. Then either delete the generated
+project directory and re-run genesis, or else just re-run it with the
+``--force`` command-line flag, so that it is forced to overwrite the previously
+generated project.
 
 
 Config file
