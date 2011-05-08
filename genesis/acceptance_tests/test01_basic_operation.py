@@ -12,8 +12,10 @@ from unittest import TestCase
 from genesis.paths import CONFIG
 
 
+SCRIPT = 'genesis-script.py'
 TEST_TEMPLATE = 'testTemplate'
 TEST_DIR = dirname(__file__)
+TEST_CONFIG = 'test_config_dir'
 
 
 def read_file(filename):
@@ -38,11 +40,11 @@ class Basic_operation(TestCase):
 
     def _run_genesis(self, *params):
         script = normpath(
-            join(dirname(__file__), '..', '..', 'genesis-script.py')
+            join(dirname(__file__), '..', '..', SCRIPT)
         )
         process = Popen(
             [ executable, script ] +
-            [ '--config-dir=%s' % (join(TEST_DIR, 'testConfigDir'),) ] +
+            [ '--config-dir=%s' % (join(TEST_DIR, TEST_CONFIG),) ] +
             list(params)
         )
         return process.wait()
@@ -93,12 +95,6 @@ class Basic_operation(TestCase):
                 '\n'
             )
         )
-
-    # TODO
-    # Putting 'name' positional arg into argparse parser uses the first
-    # unrecognised optional arg (e.g. --author) to populate it. Removing
-    # 'name' from argparse, to be handled by parse_positional_args, means it
-    # is missing from the auto-generated usage text.
 
     def test_zero_args_shows_usage(self):
         self.run_genesis_fail()
