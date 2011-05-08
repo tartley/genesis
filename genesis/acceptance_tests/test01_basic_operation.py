@@ -31,14 +31,13 @@ class Basic_operation(TestCase):
         self.orig_cwd = getcwd()
         chdir(self.temp_dir)
 
-
     def tearDown(self):
         # cd back to original cwd and rm the temp directory
         chdir(self.orig_cwd)
         rmtree(self.temp_dir)
-exitva
 
-    def _run_genesis(self, *params):
+
+    def run_genesis(self, *params):
         script = normpath(
             join(dirname(__file__), '..', '..', SCRIPT)
         )
@@ -50,23 +49,15 @@ exitva
             stderr=PIPE,
         )
         out, err = process.communicate()
-        return process.returncode
-
-    def run_genesis_ok(self, *params):
-        exitval = self._run_genesis(*params)
-        self.assertEqual(exitval, 0)
-
-    def run_genesis_fail(self, *params):
-        exitval = self._run_genesis(*params)
-        self.assertEqual(exitval, 2)
-
+        return process.returncode, out, err
 
     def test_template_is_copied_and_tags_expanded(self):
-        self.run_genesis_ok(
+        exitval, out, err = self.run_genesis(
             '--template={}'.format(TEST_TEMPLATE),
             'myproj',
             'author=Jonathan Hartley',
         )
+        self.assertEqual(exitval, 0)
 
         # genesis creates a 'myproj' dir
         myproj_dir = join(self.temp_dir, 'myproj')
@@ -100,7 +91,8 @@ exitva
         )
 
     def test_zero_args_shows_usage(self):
-        self.run_genesis_fail()
+        exitval, out, err = self.run_genesis()
+        self.assertEqual(exitval, 2)
 
     def DONTtest_list_unreplaced_tags(self):
         self.fail()
