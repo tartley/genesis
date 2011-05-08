@@ -4,7 +4,7 @@ from os.path import (
     dirname, exists, expanduser, isdir, isfile, join, normpath, relpath
 )
 from shutil import copytree, rmtree
-from subprocess import Popen
+from subprocess import PIPE, Popen
 from sys import executable
 from tempfile import mkdtemp
 from unittest import TestCase
@@ -36,7 +36,7 @@ class Basic_operation(TestCase):
         # cd back to original cwd and rm the temp directory
         chdir(self.orig_cwd)
         rmtree(self.temp_dir)
-
+exitva
 
     def _run_genesis(self, *params):
         script = normpath(
@@ -45,9 +45,12 @@ class Basic_operation(TestCase):
         process = Popen(
             [ executable, script ] +
             [ '--config-dir={}'.format(join(TEST_DIR, TEST_CONFIG)) ] +
-            list(params)
+            list(params),
+            stdout=PIPE,
+            stderr=PIPE,
         )
-        return process.wait()
+        out, err = process.communicate()
+        return process.returncode
 
     def run_genesis_ok(self, *params):
         exitval = self._run_genesis(*params)
