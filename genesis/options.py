@@ -58,7 +58,7 @@ class Options():
             '\n  '.join(
                 ['{'] +
                 [
-                    '%s=%s' % (key, value)
+                    '{}={}'.format(key, value)
                     for key, value in vars(self).items()
                 ]
             ) +
@@ -83,7 +83,9 @@ def extract_name(options, parser):
         argparse.ArgumentParser.print_usage(parser)
         sys.exit(2)
     if len(names) > 1:
-        msg = 'More than one project name specified (%s)' % (', '.join(names),)
+        msg = 'More than one project name specified ({})'.format(
+            ', '.join(names)
+        )
         sys.stderr.write(msg)
         argparse.ArgumentParser.print_usage(parser)
         sys.exit(2)

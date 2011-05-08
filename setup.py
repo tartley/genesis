@@ -55,7 +55,7 @@ def get_sdist_config():
         author_email='tartley@tartley.com',
         keywords='Python project template',
         packages=find_packages(exclude=('*.tests',)),
-        data_files=get_data_files('share/doc/%s' % (NAME,), 'docs/html'),
+        data_files=get_data_files('share/doc/{}'.format(NAME), 'docs/html'),
         package_data={
             NAME:
                 get_package_data('data') +

@@ -44,7 +44,7 @@ class Basic_operation(TestCase):
         )
         process = Popen(
             [ executable, script ] +
-            [ '--config-dir=%s' % (join(TEST_DIR, TEST_CONFIG),) ] +
+            [ '--config-dir={}'.format(join(TEST_DIR, TEST_CONFIG)) ] +
             list(params)
         )
         return process.wait()
@@ -60,7 +60,7 @@ class Basic_operation(TestCase):
 
     def test_template_is_copied_and_tags_expanded(self):
         self.run_genesis_ok(
-            '--template=%s' % (TEST_TEMPLATE,),
+            '--template={}'.format(TEST_TEMPLATE),
             'myproj',
             'author=Jonathan Hartley',
         )
