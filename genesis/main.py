@@ -7,13 +7,13 @@ from .options import parse_args
 
 
 def create_dest_dir(name):
-    #if exists( name ):
-        #if listdir( options.name ):
-            #print(
-                #"Directory '%s' is not empty, use --force" % (options.name,),
-                #file=sys.stdout
-            #)
-    os.mkdir(name)
+    if not exists( name ):
+        os.mkdir(name)
+    #if listdir( options.name ):
+        #print(
+            #"Directory '%s' is not empty, use --force" % (options.name,),
+            #file=sys.stdout
+        #)
 
 
 def copy_tree(source, dest, transform):

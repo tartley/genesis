@@ -1,5 +1,5 @@
 
-from os import chdir, getcwd
+from os import chdir, getcwd, mkdir
 from os.path import (
     dirname, exists, expanduser, isdir, isfile, join, normpath, relpath
 )
@@ -51,13 +51,16 @@ class Basic_operation(TestCase):
         out, err = process.communicate()
         return process.returncode, out, err
 
-    def test_template_is_copied_and_tags_expanded(self):
+
+    def assert_genesis_runs_ok(self):
         exitval, out, err = self.run_genesis(
             '--template={}'.format(TEST_TEMPLATE),
             'myproj',
             'author=Jonathan Hartley',
         )
         self.assertEqual(exitval, 0)
+        self.assertEqual(out, b'')
+        self.assertEqual(err, b'')
 
         # genesis creates a 'myproj' dir
         myproj_dir = join(self.temp_dir, 'myproj')
@@ -68,9 +71,14 @@ class Basic_operation(TestCase):
         self.assertTrue( isdir( join(myproj_dir, 'dir1') ) )
         self.assertTrue( isfile( join(myproj_dir, 'dir1', 'file2') ) )
 
+
+    def test_template_is_copied_and_tags_expanded(self):
+        self.assert_genesis_runs_ok()
+
         # file1 has had G{name} replaced by 'myproj',
         # and 'G{author} replaced by 'Jonathan Hartley',
         # as were specified on the command-line
+        myproj_dir = join(self.temp_dir, 'myproj')
         self.assertEqual(
             read_file(join(myproj_dir, 'file1')),
             (
@@ -93,6 +101,12 @@ class Basic_operation(TestCase):
     def test_zero_args_shows_usage(self):
         exitval, out, err = self.run_genesis()
         self.assertEqual(exitval, 2)
+        self.assertEqual(out, b'')
+        self.assertTrue(b'usage:' in err)
+
+    def test_existing_empty_dir_is_filled(self):
+        mkdir('myproj')
+        self.assert_genesis_runs_ok()
 
     def DONTtest_list_unreplaced_tags(self):
         self.fail()
