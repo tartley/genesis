@@ -63,7 +63,7 @@ class Basic_operation(TestCase):
         )
         self.assertEqual(err, b'', str_decode(err))
         self.assertEqual(out, b'', str_decode(out))
-        self.assertEqual(exitval, 0, str_decode(err + out))
+        self.assertEqual(exitval, 0)
 
         # genesis creates a 'myproj' dir
         myproj_dir = join(self.temp_dir, 'myproj')
@@ -79,8 +79,10 @@ class Basic_operation(TestCase):
         exitval, out, err = self.run_genesis(*args)
         if expected_err:
             self.assertTrue(expected_err in str(err), str_decode(err))
+        else:
+            self.assertEqual(err, b'', str_decode(err))
         self.assertEqual(out, b'', str_decode(out))
-        self.assertEqual(exitval, 2, str_decode(err + out))
+        self.assertEqual(exitval, 2)
 
 
     def test_template_is_copied_and_tags_expanded(self):
@@ -88,7 +90,7 @@ class Basic_operation(TestCase):
 
         # file1 has had G{name} replaced by 'myproj',
         # and 'G{author} replaced by 'Jonathan Hartley',
-        # as were specified on the command-line
+        # as specified on the command-line
         myproj_dir = join(self.temp_dir, 'myproj')
         self.assertEqual(
             read_file(join(myproj_dir, 'file1')),
@@ -109,15 +111,17 @@ class Basic_operation(TestCase):
             )
         )
 
+
     def test_zero_args_shows_usage(self):
         self.assert_genesis_gives_error(expected_err='usage:')
-        # genesis has not created a 'myproj' dir
         myproj_dir = join(self.temp_dir, 'myproj')
         self.assertFalse( exists(myproj_dir) )
+
 
     def test_existing_empty_dir_is_filled(self):
         mkdir('myproj')
         self.assert_genesis_runs_ok()
+
 
     def test_existing_full_dir_raises_an_error(self):
         mkdir('myproj')
@@ -127,7 +131,9 @@ class Basic_operation(TestCase):
             '--template={}'.format(TEST_TEMPLATE),
             'myproj',
             'author=Jonathan Hartley',
+            expected_err="Output directory 'myproj' is not empty, use --force",
         )
+
 
     def DONTtest_list_unreplaced_tags(self):
         self.fail()
