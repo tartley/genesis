@@ -117,9 +117,9 @@ def parse_args():
 
     # command-line can override location of config file
     if opts_cmdline.config_dir:
-        paths.CONFIG = opts_cmdline.config_dir
+        paths.USER_CONFIG = opts_cmdline.config_dir
 
-    opts_file = parse_config_file(join(paths.CONFIG, CONFIG_FILENAME))
+    opts_file = parse_config_file(join(paths.USER_CONFIG, CONFIG_FILENAME))
 
     # command-line overrides config file
     result = Options()

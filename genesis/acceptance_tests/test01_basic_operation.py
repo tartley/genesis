@@ -9,7 +9,7 @@ from sys import executable
 from tempfile import mkdtemp
 from unittest import TestCase
 
-from genesis.paths import CONFIG
+from genesis import paths
 
 
 SCRIPT = 'genesis-script.py'
@@ -74,9 +74,9 @@ class Basic_operation(TestCase):
     def assert_genesis_gives_error(self, *args, expected_err=None):
         exitval, out, err = self.run_genesis(*args)
         if expected_err:
-            self.assertTrue(expected_err in str(err), str_decode(err))
+            self.assertIn(bytes(expected_err, 'utf-8'), err, str_decode(err))
         else:
-            self.assertEqual(err, b'', str_decode(err))
+            self.assertEqual(str(err), '', str_decode(err))
         self.assertEqual(out, b'', str_decode(out))
         self.assertEqual(exitval, 2)
 
@@ -148,6 +148,15 @@ class Basic_operation(TestCase):
             '--force',
             'myproj',
             'author=Jonathan Hartley',
+        )
+
+    def test_missing_template_raises_error(self):
+        self.assert_genesis_gives_error(
+            '--template={}'.format('non_existant'),
+            'myproj',
+            expected_err="Template 'non_existant' not found in {}.".format(
+                paths.tilde_encode(join(TEST_DIR, TEST_CONFIG))
+            ),
         )
 
 

@@ -1,10 +1,24 @@
 
 from os import listdir, mkdir, remove, walk
-from os.path import abspath, exists, isdir, isfile, join, sep
+from os.path import abspath, exists, expanduser, isdir, isfile, join, sep
 from sys import exit, stderr
 
 from . import paths
 from .options import parse_args
+
+
+def locate_template(name):
+    template_dir = join(paths.USER_CONFIG, name)
+    if isdir(template_dir):
+        return template_dir
+    else:
+        print(
+            "Template '{}' not found in {}.".format(
+                name, paths.tilde_encode(paths.USER_CONFIG)
+            ),
+            file=stderr
+        )
+        exit(2)
 
 
 def create_dest_dir(name, force):
@@ -61,11 +75,13 @@ def create_project(options):
         return content
 
     create_dest_dir(options.name, options.force)
-    copy_tree( join(paths.CONFIG, options.template), options.name, transform)
+    copy_tree( join(paths.USER_CONFIG, options.template), options.name, transform)
 
 
 def main():
-    create_project( parse_args() )
+    options = parse_args()
+    options.template = locate_template(options.template)
+    create_project(options)
 
 
 if __name__ == '__main__':
