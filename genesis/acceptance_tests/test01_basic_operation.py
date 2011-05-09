@@ -13,7 +13,7 @@ from genesis.paths import CONFIG
 
 
 SCRIPT = 'genesis-script.py'
-TEST_TEMPLATE = 'testTemplate'
+TEST_TEMPLATE = 'test_template'
 TEST_DIR = dirname(__file__)
 TEST_CONFIG = 'test_config_dir'
 
