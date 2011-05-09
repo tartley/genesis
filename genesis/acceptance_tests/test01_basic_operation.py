@@ -154,6 +154,3 @@ class Basic_operation(TestCase):
     def DONTtest_list_unreplaced_tags(self):
         self.fail()
 
-    def DONTtest_force_arg_to_overwrite_non_empty_dirs(self):
-        self.fail()
-
