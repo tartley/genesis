@@ -161,10 +161,9 @@ Now you need only issue the command-line::
 Known Issues
 ------------
 
-There is no default template.
-
-Genesis won't work unless it is installed, since it relies on finding
-template directories and config file in your ~/.genesis directory.
+If Genesis doesn't find the default template in ~/.genesis, it should look
+in the package directory, so that it works from source or out of box on
+install, without having to copy anything to ~/.genesis.
 
 Undefined tag values are not reported.
 

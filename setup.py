@@ -74,6 +74,7 @@ def create_manifest_in(config):
         for root, branches in config['package_data'].items():
             for branch in branches:
                 fp.write('include ' + join(root, branch) + '\n')
+    # TODO: we should also add lines for data_files too.
 
 
 def main():
