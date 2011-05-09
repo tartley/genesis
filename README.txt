@@ -163,6 +163,9 @@ Known Issues
 
 There is no default template.
 
+Genesis won't work unless it is installed, since it relies on finding
+template directories and config file in your ~/.genesis directory.
+
 Undefined tag values are not reported.
 
 --license not implemented. Assumes your project is BSD license.
