@@ -1,12 +1,12 @@
 from glob import glob
-import os
-from os.path import join
+from os import listdir, walk
+from os.path import isfile, join
 from pprint import pprint
 import sys
 
 
 NAME = 'genesis'
-from genesis import RELEASE, VERSION
+from genesis import RELEASE
 
 SCRIPT = None
 CONSOLE = False
@@ -24,17 +24,17 @@ def read_description(filename):
 
 def get_package_data(topdir, excluded=set()):
     retval = []
-    for dirname, subdirs, files in os.walk(join(NAME, topdir)):
-        for x in excluded:
-            if x in subdirs:
-                subdirs.remove(x)
-        retval.append(join(dirname[len(NAME)+1:], '*.*'))
+    for dirname, subdirs, files in walk(join(NAME, topdir)):
+        if any(x in subdirs for x in excluded):
+            subdirs.remove(x)
+        if any(isfile(f) for f in listdir(dirname)):
+            retval.append(join(dirname[len(NAME)+1:], '*.*'))
     return retval
 
 
 def get_data_files(dest, source):
     retval = []
-    for dirname, subdirs, files in os.walk(source):
+    for dirname, subdirs, files in walk(source):
         retval.append(
             (join(dest, dirname[len(source)+1:]), glob(join(dirname, '*.*')))
         )
@@ -55,12 +55,8 @@ def get_sdist_config():
         author_email='tartley@tartley.com',
         keywords='Python project template',
         packages=find_packages(exclude=('*.tests',)),
-        data_files=get_data_files('share/doc/{}'.format(NAME), 'docs/html'),
-        package_data={
-            NAME:
-                get_package_data('data') +
-                ['examples/*.py']
-        },
+        data_files=None, #get_data_files('share/doc/' + NAME, 'docs/html'),
+        package_data={ NAME: get_package_data('config') },
         # see classifiers http://pypi.python.org/pypi?:action=list_classifiers
         classifiers=[
             'Development Status :: 3 - Alpha',
@@ -73,16 +69,25 @@ def get_sdist_config():
     )
 
 
+def create_manifest_in(config):
+    with open('MANIFEST.in', 'w') as fp:
+        for root, branches in config['package_data'].items():
+            for branch in branches:
+                fp.write('include ' + join(root, branch) + '\n')
+
+
 def main():
     # these imports inside main() so that other scripts can import this file
     # cheaply, to get at its module-level constants like NAME
 
     # use_setuptools must be called before importing from setuptools
-    from distribute_setup import use_setuptools
-    use_setuptools()
+    #from distribute_setup import use_setuptools
+    #use_setuptools()
+
     from setuptools import setup
 
     config = get_sdist_config()
+    create_manifest_in(config)
 
     if '--verbose' in sys.argv:
         pprint(config)
