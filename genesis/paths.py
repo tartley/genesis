@@ -1,8 +1,11 @@
 
-from os.path import expanduser, join, sep
+from os.path import dirname, expanduser, join, sep
 
 HOME = expanduser('~')
 USER_CONFIG = join(HOME, '.genesis')
+
+SOURCE = dirname(__file__)
+PACKAGE_CONFIG = join(SOURCE, 'config')
 
 
 def tilde_encode(filename):

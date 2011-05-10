@@ -7,20 +7,6 @@ from . import paths
 from .options import parse_args
 
 
-def locate_template(name):
-    template_dir = join(paths.USER_CONFIG, name)
-    if isdir(template_dir):
-        return template_dir
-    else:
-        print(
-            "Template '{}' not found in {}.".format(
-                name, paths.tilde_encode(paths.USER_CONFIG)
-            ),
-            file=stderr
-        )
-        exit(2)
-
-
 def create_dest_dir(name, force):
     if not exists(name):
         mkdir(name)
@@ -80,7 +66,6 @@ def create_project(options):
 
 def main():
     options = parse_args()
-    options.template = locate_template(options.template)
     create_project(options)
 
 

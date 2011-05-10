@@ -61,6 +61,8 @@ class Basic_operation(TestCase):
         self.assertEqual(out, b'', str_decode(out))
         self.assertEqual(exitval, 0)
 
+
+    def assert_test_template_files_created(self):
         # genesis creates a 'myproj' dir
         myproj_dir = join(self.temp_dir, 'myproj')
         self.assertTrue( exists(myproj_dir) )
@@ -69,6 +71,18 @@ class Basic_operation(TestCase):
         self.assertTrue( isfile( join(myproj_dir, 'file1') ) )
         self.assertTrue( isdir( join(myproj_dir, 'dir1') ) )
         self.assertTrue( isfile( join(myproj_dir, 'dir1', 'file2') ) )
+
+
+    def assert_default_template_files_created(self):
+        # genesis creates a 'myproj' dir
+        myproj_dir = join(self.temp_dir, 'myproj')
+        self.assertTrue( exists(myproj_dir) )
+
+        # ...inside of which is file1 and dir1, containing file2
+        self.assertTrue( isfile( join(myproj_dir, 'LICENSE.txt') ) )
+        self.assertTrue( isfile( join(myproj_dir, 'Makefile') ) )
+        self.assertTrue( isfile( join(myproj_dir, 'README.txt') ) )
+        self.assertTrue( isfile( join(myproj_dir, 'TODO.txt') ) )
 
 
     def assert_genesis_gives_error(self, *args, expected_err=None):
@@ -81,12 +95,13 @@ class Basic_operation(TestCase):
         self.assertEqual(exitval, 2)
 
 
-    def test_template_is_copied_and_tags_expanded(self):
+    def test_template_should_be_copied_and_tags_expanded(self):
         self.assert_genesis_runs_ok(
             '--template={}'.format(TEST_TEMPLATE),
             'myproj',
             'author=Jonathan Hartley',
         )
+        self.assert_test_template_files_created()
 
         # file1 has had G{name} replaced by 'myproj',
         # and 'G{author} replaced by 'Jonathan Hartley',
@@ -112,10 +127,11 @@ class Basic_operation(TestCase):
         )
 
 
-    def test_zero_args_shows_usage(self):
+    def test_zero_args_should_show_usage(self):
         self.assert_genesis_gives_error(expected_err='usage:')
         myproj_dir = join(self.temp_dir, 'myproj')
         self.assertFalse( exists(myproj_dir) )
+
 
     def test_existing_empty_dir_is_filled(self):
         mkdir('myproj')
@@ -124,8 +140,10 @@ class Basic_operation(TestCase):
             'myproj',
             'author=Jonathan Hartley',
         )
+        self.assert_test_template_files_created()
 
-    def test_existing_full_dir_raises_an_error(self):
+
+    def test_existing_full_dir_should_raise_an_error(self):
         mkdir('myproj')
         with open(join('myproj', 'somefile'), 'w') as fp:
             pass
@@ -135,6 +153,7 @@ class Basic_operation(TestCase):
             'author=Jonathan Hartley',
             expected_err="Output directory 'myproj' is not empty, use --force",
         )
+
 
     def test_existing_full_dir_with_force_param_should_be_written_to(self):
         mkdir('myproj')
@@ -147,7 +166,8 @@ class Basic_operation(TestCase):
             'author=Jonathan Hartley',
         )
 
-    def test_missing_template_raises_error(self):
+
+    def test_missing_template_should_raise_error(self):
         self.assert_genesis_gives_error(
             '--template={}'.format('non_existant'),
             'myproj',
@@ -155,6 +175,14 @@ class Basic_operation(TestCase):
                 paths.tilde_encode(join(TEST_DIR, TEST_CONFIG))
             ),
         )
+
+
+    def test_default_template_read_from_package_if_not_in_config_dir(self):
+        self.assert_genesis_runs_ok(
+            'myproj',
+            'author=Jonathan Hartley',
+        )
+        self.assert_default_template_files_created()
 
 
     def DONTtest_list_unreplaced_tags(self):

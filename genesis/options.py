@@ -1,6 +1,6 @@
 
 import argparse
-from os.path import isfile, join
+from os.path import isdir, isfile, join
 import sys
 
 from . import paths
@@ -32,7 +32,6 @@ def create_parser():
             'name=value pairs.'
     )
     return parser
-
 
 
 def parse_config_file(filename):
@@ -76,20 +75,20 @@ def extract_name(options, parser):
     Remove the name from the list, & return (name, tags).
     '''
     if 'name' not in options:
-        sys.stderr.write('Project name not specified.')
+        print('Project name not specified.', file=sys.stderr)
         parser.print_usage()
         sys.exit(2)
 
     names = [o for o in options.name if '=' not in o]
     if len(names) == 0:
-        sys.stderr.write('Project name not specified.')
+        print('Project name not specified.', file=sys.stderr)
         argparse.ArgumentParser.print_usage(parser)
         sys.exit(2)
     if len(names) > 1:
         msg = 'More than one project name specified ({})'.format(
             ', '.join(names)
         )
-        sys.stderr.write(msg)
+        print(msg, file=sys.stderr)
         argparse.ArgumentParser.print_usage(parser)
         sys.exit(2)
 
@@ -103,6 +102,25 @@ def tags_to_dict(taglist):
         pos = tag.find('=')
         tags[tag[:pos]] = tag[pos+1:]
     return tags
+
+
+def locate_template(name):
+    possibles = [
+        paths.USER_CONFIG,
+        paths.PACKAGE_CONFIG,
+    ]
+    for possible in possibles:
+        template_dir = join(possible, name)
+        if isdir(template_dir):
+            return template_dir
+
+    print(
+        "Template '{}' not found in {}.".format(
+            name, paths.tilde_encode(possibles[0])
+        ),
+        file=sys.stderr
+    )
+    sys.exit(2)
 
 
 def parse_args():
@@ -121,10 +139,14 @@ def parse_args():
 
     opts_file = parse_config_file(join(paths.USER_CONFIG, CONFIG_FILENAME))
 
-    # command-line overrides config file
+    # command-line name=value tags override command-line options, and
+    # both override the config file
     result = Options()
     result.update(opts_file)
     result.update(vars(opts_cmdline))
     result.update(opts_tags)
+
+    result.template = locate_template(result.template)
+
     return result
 
