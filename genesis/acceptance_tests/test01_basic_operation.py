@@ -15,7 +15,7 @@ from genesis import paths
 SCRIPT = 'genesis-script.py'
 TEST_TEMPLATE = 'test_template'
 TEST_DIR = dirname(__file__)
-TEST_CONFIG = 'test_config_dir'
+TEST_CONFIG = 'fake_config'
 
 
 def read_file(filename):
@@ -117,7 +117,6 @@ class Basic_operation(TestCase):
         myproj_dir = join(self.temp_dir, 'myproj')
         self.assertFalse( exists(myproj_dir) )
 
-
     def test_existing_empty_dir_is_filled(self):
         mkdir('myproj')
         self.assert_genesis_runs_ok(
@@ -125,7 +124,6 @@ class Basic_operation(TestCase):
             'myproj',
             'author=Jonathan Hartley',
         )
-
 
     def test_existing_full_dir_raises_an_error(self):
         mkdir('myproj')
@@ -137,7 +135,6 @@ class Basic_operation(TestCase):
             'author=Jonathan Hartley',
             expected_err="Output directory 'myproj' is not empty, use --force",
         )
-
 
     def test_existing_full_dir_with_force_param_should_be_written_to(self):
         mkdir('myproj')
