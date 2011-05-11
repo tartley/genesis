@@ -59,8 +59,8 @@ For example, ``author_email=me@example.com`` on the command-line will cause
 feature that distinguishes it from ``name=value`` pairs.
 
 
-Missing tag values
-------------------
+Undefined tag values
+--------------------
 
 If the template contains any ``G{name}`` tags which do not have a value defined
 on the command-line nor in the config file, then a warning will be issued,
@@ -179,6 +179,14 @@ based on --license.
 
 Auto generated tags: G{year}, G{date}
 
+Not actually tested on Ubuntu
+
+No binaries are available, which makes Genesis unusable unless you you have
+Python 3.2 foremost on your path.
+
+Not for v1 release:
+...................
+
 Don't know what to use for project url:
 Explicit G{url} tag requires setting on command line for every project, or else
 using a wrong default value.
@@ -188,14 +196,6 @@ But presumably this pattern is not applicable to many projects.
 How about the not-quite-as clever::
     url='G{url_root}/G{name}',
 Final alternative is to leave blank. :-(
-
-Not actually tested on Ubuntu
-
-No binaries are available, which makes Genesis unusable unless you you have
-Python 3.2 foremost on your path.
-
-Not for v1 release:
-...................
 
 Should allow user to interactively supply values for undefined tags.
 
