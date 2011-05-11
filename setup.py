@@ -54,7 +54,7 @@ def get_sdist_config():
         packages=find_packages(), #exclude=('*.tests',)),
         data_files=None, #get_data_files('share/doc/' + NAME, 'docs/html'),
         package_data={ NAME: get_package_data('config') },
-        scripts=['genesis.bat', 'genesis-script.py'],
+        scripts=['genesis.bat'],
         # see classifiers http://pypi.python.org/pypi?:action=list_classifiers
         classifiers=[
             'Development Status :: 3 - Alpha',

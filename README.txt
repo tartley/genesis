@@ -161,9 +161,7 @@ Now you need only issue the command-line::
 Known Issues
 ------------
 
-If Genesis doesn't find the default template in ~/.genesis, it should look
-in the package directory, so that it works from source or out of box on
-install, without having to copy anything to ~/.genesis.
+Default template is weak, currently only a placeholder.
 
 Undefined tag values are not reported.
 
@@ -171,10 +169,12 @@ Undefined tag values are not reported.
 
 Not actually tested on Ubuntu
 
-Sdist contains a dist directory. Is this required?
+No binaries are available, which makes Genesis unusable unless you you have
+Python 3.2 foremost on your path.
 
-No binaries are available, which makes Genesis unusable unless you use Python
-3.2.
+Doesn't preserve permissions on template files.
+
+Sdist contains a dist directory. Is this required?
 
 The config file is parsed using 'eval'. I'm not smart enough to know whether
 this is a security problem.
