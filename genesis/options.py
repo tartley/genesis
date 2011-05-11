@@ -85,10 +85,12 @@ def extract_name(options, parser):
         argparse.ArgumentParser.print_usage(parser)
         sys.exit(2)
     if len(names) > 1:
-        msg = 'More than one project name specified ({})'.format(
-            ', '.join(names)
+        print(
+            'More than one project name specified ({})'.format(
+                ', '.join(names)
+            ),
+            file=sys.stderr
         )
-        print(msg, file=sys.stderr)
         argparse.ArgumentParser.print_usage(parser)
         sys.exit(2)
 
