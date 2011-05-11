@@ -12,7 +12,7 @@ from unittest import TestCase
 from genesis import paths
 
 
-SCRIPT = 'genesis-script.py'
+SCRIPT = 'genesis.bat'
 TEST_TEMPLATE = 'test_template'
 TEST_DIR = dirname(__file__)
 TEST_CONFIG = 'fake_config'
@@ -36,8 +36,9 @@ class Basic_operation(TestCase):
 
     def tearDown(self):
         # cd back to original cwd and rm the temp directory
-        chdir(self.orig_cwd)
-        rmtree(self.temp_dir)
+        #chdir(self.orig_cwd)
+        #rmtree(self.temp_dir)
+        pass
 
 
     def run_genesis(self, *params):
@@ -45,7 +46,7 @@ class Basic_operation(TestCase):
             join(dirname(__file__), '..', '..', SCRIPT)
         )
         process = Popen(
-            [ executable, script ] +
+            [ script ] +
             [ '--config-dir={}'.format(join(TEST_DIR, TEST_CONFIG)) ] +
             list(params),
             stdout=PIPE,
@@ -79,9 +80,15 @@ class Basic_operation(TestCase):
         self.assertTrue( exists(myproj_dir) )
 
         # ...inside of which is file1 and dir1, containing file2
+        # TODO
+        #self.assertTrue(  isdir( join(myproj_dir, 'myproj') ) )
+        self.assertTrue( isfile( join(myproj_dir, 'CHANGES.txt') ) )
+        # TODO
+        #self.assertTrue(  isdir( join(myproj_dir, 'myproj.bat') ) )
         self.assertTrue( isfile( join(myproj_dir, 'LICENSE.txt') ) )
         self.assertTrue( isfile( join(myproj_dir, 'Makefile') ) )
         self.assertTrue( isfile( join(myproj_dir, 'README.txt') ) )
+        self.assertTrue( isfile( join(myproj_dir, 'setup.py') ) )
         self.assertTrue( isfile( join(myproj_dir, 'TODO.txt') ) )
 
 

@@ -1,3 +1,5 @@
 @echo off
-python -c "from genesis.main import main; main()" %*
+:: %~dp0 is .bat file shorthand for same directory as this .bat file,
+:: including trailing \
+python "%~dp0genesis-script.py" %*
 
