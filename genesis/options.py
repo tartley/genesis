@@ -48,28 +48,9 @@ def parse_config_file(filename):
     return config_vars
 
 
-class Options():
-    '''
-    Stores a dict of values such that they can be accessed as instance.key,
-    instead of instance['key']
-    '''
-    def update(self, d):
-        self.__dict__.update(d)
-    def __str__(self):
-        return (
-            '\n  '.join(
-                ['{'] +
-                [
-                    '{}={}'.format(key, value)
-                    for key, value in vars(self).items()
-                ]
-            ) +
-            '\n}'
-        )
-
 def extract_name(options, parser):
     '''
-    Options.name contains list of tags, zero or more of which are name=value
+    Options[name] contains list of tags, zero or more of which are name=value
     pairs defining a tag, but exactly one of which is just a 'name', denoting
     the project name that is to be created.
     Remove the name from the list, & return (name, tags).
@@ -127,8 +108,7 @@ def locate_template(name):
 
 def parse_args():
     '''
-    Combine args from config file and command line into a single Options
-    instance.
+    Combine args from config file and command line into a single dict
     '''
     parser = create_parser()
     opts_cmdline = parser.parse_args()
@@ -143,12 +123,12 @@ def parse_args():
 
     # command-line name=value tags override command-line options, and
     # both override the config file
-    result = Options()
+    result = {}
     result.update(opts_file)
     result.update(vars(opts_cmdline))
     result.update(opts_tags)
 
-    result.template = locate_template(result.template)
+    result['template']= locate_template(result['template'])
 
     return result
 

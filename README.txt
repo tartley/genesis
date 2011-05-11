@@ -63,26 +63,29 @@ Undefined tag values
 --------------------
 
 If the template contains any ``G{name}`` tags which do not have a value defined
-on the command-line nor in the config file, then a warning will be issued,
-e.g::
+on the command-line nor in the config file, then a warning 'Undefined tags
+in template' will be issued.
 
-    Undefined: G{license} in path/file.py, line 65
+The project that is created will still have the named ``G{}`` tags in it.
+To fix this, you can simply search for these tags and replace them manually.
+Alternatively, re-run Genesis with a name=value pair added to the command-line
+for each of the undefined tags. Better still would be to define the tags
+permanently in your config file, so they will not cause the same problem
+in future.
 
-The project that is created will still have the text ``G{license}`` in it at
-this location. To fix this, you should define a value for ``license`` either on
-the command line or in your config file. Then either delete the generated
-project directory and re-run genesis, or else just re-run it with the
-``--force`` command-line flag, so that it is forced to overwrite the previously
+Regardless, if you end up re-running Genesis to regenerate the project, then
+you will either have to delete the one that was just created, or use the
+``--force`` command-line flag, so that Genesis overwrites the previously
 generated project.
 
 
 Config file
 -----------
 
-The config file, ``~/.genesis/genesis.config``, is a Python3.2 syntax file,
-although it has no .py extension. In it values can be assigned to
-variables which behave just like flags or name-value pairs on the command-line.
-For example, a config file might contain::
+The config file, ``~/.genesis/genesis.config``, is a Python 3.2 syntax file,
+although it has no .py extension. In it values can be assigned to variables
+which behave just like flags or name-value pairs on the command-line. For
+example, a config file might contain::
 
     template = 'my_favourite'
     author = 'Jonathan Hartley'
@@ -90,7 +93,7 @@ For example, a config file might contain::
 This is equivalent to specifying
 ``--template=my_favourite author=Jonathan\ Hartley`` on the command-line.
 
-Values in the config file are overriden by the command-line.
+Values in the config file are overridden by the command-line.
 
 If your template contains tags with names which are not valid Python variable
 names, you will not be able to specify those tags' values in the config file.
@@ -186,6 +189,8 @@ Python 3.2 foremost on your path.
 
 Not for v1 release:
 ...................
+
+Default template setup.py does not put data_files into the manifest.in
 
 Don't know what to use for project url:
 Explicit G{url} tag requires setting on command line for every project, or else

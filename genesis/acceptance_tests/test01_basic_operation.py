@@ -56,11 +56,14 @@ class Basic_operation(TestCase):
         return process.returncode, out, err
 
 
-    def assert_genesis_runs_ok(self, *args):
-        exitval, out, err = self.run_genesis(*args)
-        self.assertEqual(err, b'', str_decode(err))
-        self.assertEqual(out, b'', str_decode(out))
-        self.assertEqual(exitval, 0)
+    def assert_genesis_runs(self, *args, err=None, exit=0):
+        exitval, outval, errval = self.run_genesis(*args)
+        if err:
+            self.assertIn(bytes(err, 'utf-8'), errval, str_decode(errval))
+        else:
+            self.assertEqual(errval, bytes('', 'utf-8'), str_decode(errval))
+        self.assertEqual(outval, b'', str_decode(outval))
+        self.assertEqual(exitval, exit)
 
 
     def assert_test_template_files_created(self):
@@ -88,18 +91,8 @@ class Basic_operation(TestCase):
         self.assertTrue( isfile( join(myproj_dir, 'TODO.txt') ) )
 
 
-    def assert_genesis_gives_error(self, *args, expected_err=None):
-        exitval, out, err = self.run_genesis(*args)
-        if expected_err:
-            self.assertIn(bytes(expected_err, 'utf-8'), err, str_decode(err))
-        else:
-            self.assertEqual(str(err), '', str_decode(err))
-        self.assertEqual(out, b'', str_decode(out))
-        self.assertEqual(exitval, 2)
-
-
     def test_template_should_be_copied_and_tags_expanded(self):
-        self.assert_genesis_runs_ok(
+        self.assert_genesis_runs(
             '--template=' + TEST_TEMPLATE,
             'myproj',
             'author=Jonathan Hartley',
@@ -131,16 +124,17 @@ class Basic_operation(TestCase):
 
 
     def test_zero_args_should_show_usage(self):
-        self.assert_genesis_gives_error(expected_err='usage:')
+        self.assert_genesis_runs(err='usage:', exit=2)
         myproj_dir = join(self.temp_dir, 'myproj')
         self.assertFalse( exists(myproj_dir) )
 
 
     def test_existing_empty_dir_is_filled(self):
         mkdir('myproj')
-        self.assert_genesis_runs_ok(
+        self.assert_genesis_runs(
             '--template=' + TEST_TEMPLATE,
             'myproj',
+            'author=Jonathan Hartley',
         )
         self.assert_test_template_files_created()
 
@@ -149,10 +143,11 @@ class Basic_operation(TestCase):
         mkdir('myproj')
         with open(join('myproj', 'somefile'), 'w') as fp:
             pass
-        self.assert_genesis_gives_error(
+        self.assert_genesis_runs(
             '--template=' + TEST_TEMPLATE,
             'myproj',
-            expected_err="Output directory 'myproj' is not empty, use --force",
+            err="Output directory 'myproj' is not empty, use --force",
+            exit=2,
         )
 
 
@@ -160,34 +155,38 @@ class Basic_operation(TestCase):
         mkdir('myproj')
         with open(join('myproj', 'somefile'), 'w') as fp:
             pass
-        self.assert_genesis_runs_ok(
+        self.assert_genesis_runs(
             '--template=' + TEST_TEMPLATE,
             '--force',
             'myproj',
+            'author=Jonathan Hartley',
         )
 
 
     def test_missing_template_should_raise_error(self):
-        self.assert_genesis_gives_error(
+        self.assert_genesis_runs(
             '--template=non_existant',
             'myproj',
-            expected_err="Template 'non_existant' not found in {}.".format(
+            err="Template 'non_existant' not found in {}.".format(
                 paths.tilde_encode(join(TEST_DIR, TEST_CONFIG))
             ),
+            exit=2,
         )
 
 
     def test_default_template_read_from_package_if_not_in_config_dir(self):
-        self.assert_genesis_runs_ok(
+        self.assert_genesis_runs(
             'myproj',
+            err='Warning: Undefined tags in template:'
         )
         self.assert_default_template_files_created()
 
 
     def test_tags_in_filenames_should_be_replaced(self):
-        self.assert_genesis_runs_ok(
+        self.assert_genesis_runs(
             '--template=' + TEST_TEMPLATE,
             'myproj',
+            'author=Jonathan Hartley',
         )
         self.assertTrue(  isdir( join('myproj', 'myproj') ) )
         self.assertTrue( isfile( join('myproj', 'myproj', 'myproj.bat') ) )
