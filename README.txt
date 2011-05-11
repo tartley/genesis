@@ -161,20 +161,47 @@ Now you need only issue the command-line::
 Known Issues
 ------------
 
-Default template is weak, currently only a placeholder.
+Template tags in file and directory names should be replaced.
 
-Undefined tag values are not reported.
+Undefined tags should be reported to the user.
 
 --license not implemented. Assumes your project is BSD license.
+Should barf on unknown license choices. User should be able to add own
+licenses.
+Implementation suggestion: G{license_text} should be automatically generated
+from choice of --license. Genesis should provide the text of various well-known
+licenses.
+Alternative implementation: Before search-and-replace, we choose a license file
+based on --license.
+
+Auto generated tags: G{year}, G{date}
+
+Don't know what to use for project url:
+Explicit G{url} tag requires setting on command line for every project, or else
+using a wrong default value.
+Alternative is to try and be clever::
+    url='G{github_equiv}/G{username}/G{name}',
+But presumably this pattern is not applicable to many projects.
+How about the not-quite-as clever::
+    url='G{url_root}/G{name}',
+Final alternative is to leave blank. :-(
 
 Not actually tested on Ubuntu
 
 No binaries are available, which makes Genesis unusable unless you you have
 Python 3.2 foremost on your path.
 
+Not for v1 release:
+...................
+
+Should allow user to interactively supply values for undefined tags.
+
+Default template should include documentation.
+
 Doesn't preserve permissions on template files.
 
-Sdist contains a dist directory. Is this required?
+Sdist contains a dist directory. Is this required? (Simply do a make clean
+before make sdist?)
 
 The config file is parsed using 'eval'. I'm not smart enough to know whether
 this is a security problem.

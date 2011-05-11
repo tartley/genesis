@@ -1,6 +1,11 @@
+TODO
+----
 
+Create source control repo & commit.
 
 
 DONE
 ----
+
+Generate project files using Genesis
 

@@ -6,7 +6,8 @@
 # the PATH
 
 
-VERSION := $(shell python -c "from G{NAME} import __version__; print __version__")
+NAME := G{name}
+RELEASE := $(shell python -c "from ${NAME} import RELEASE; print(RELEASE)")
 
 
 clean:
@@ -16,42 +17,50 @@ clean:
 
 
 tags:
-	ctags -R G{NAME}
+	ctags -R ${NAME}
 .PHONY: tags
 
 
-# runsnake is a GUI profile visualiser, very useful.
-# http://www.vrplumber.com/programming/runsnakerun/
-profile:
-	python -O -m cProfile -o profile.out G{name}
-	runsnake profile.out
-.PHONY: profile
+tests:
+	python -m unittest discover -v .
+.PHONY: tests
+
+test: tests
+.PHONY: test
 
 
 sdist:
-	rm -rf dist/G{NAME}-${VERSION}.* build
+	rm -rf dist/${NAME}-${RELEASE}.* build
 	python setup.py --quiet sdist
-	rm -rf G{NAME}.egg-info
+	rm -rf ${NAME}.egg-info
 .PHONY: sdist
 
 
 register:
-	rm -rf dist/G{NAME}-${VERSION}.* build
-	python setup.py --quiet sdist register
-	rm -rf G{NAME}.egg-info
+	rm -rf dist/${NAME}-${RELEASE}.* build
+	python setup.py --quiet register
+	rm -rf ${NAME}.egg-info
 .PHONY: register
 
 
 upload:
-	rm -rf dist/G{NAME}-${VERSION}.* build
-	python setup.py --quiet sdist register upload
-	rm -rf G{NAME}.egg-info
+	rm -rf dist/${NAME}-${RELEASE}.* build
+	python setup.py --quiet sdist upload
+	rm -rf ${NAME}.egg-info
 .PHONY: upload
 
 
 py2exe:
-	rm -rf dist/G{NAME}-${VERSION}.* build
+	rm -rf dist/${NAME}-${RELEASE}.* build
 	python setup.py --quiet py2exe
-	rm -rf G{NAME}.egg-info
+	rm -rf ${NAME}.egg-info
 .PHONY: py2exe
+
+
+# runsnake is a GUI visualiser for the output of cProfile
+# http://www.vrplumber.com/programming/runsnakerun/
+profile:
+	python -O -m cProfile -o profile.out ${NAME}
+	runsnake profile.out
+.PHONY: profile
 
