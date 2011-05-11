@@ -34,11 +34,11 @@ class Basic_operation(TestCase):
         self.orig_cwd = getcwd()
         chdir(self.temp_dir)
 
+
     def tearDown(self):
         # cd back to original cwd and rm the temp directory
-        #chdir(self.orig_cwd)
-        #rmtree(self.temp_dir)
-        pass
+        chdir(self.orig_cwd)
+        rmtree(self.temp_dir)
 
 
     def run_genesis(self, *params):
@@ -64,7 +64,7 @@ class Basic_operation(TestCase):
 
 
     def assert_test_template_files_created(self):
-        # genesis creates a 'myproj' dir
+        # genesis should create a 'myproj' dir
         myproj_dir = join(self.temp_dir, 'myproj')
         self.assertTrue( exists(myproj_dir) )
 
@@ -79,17 +79,18 @@ class Basic_operation(TestCase):
         myproj_dir = join(self.temp_dir, 'myproj')
         self.assertTrue( exists(myproj_dir) )
 
-        # ...inside of which is file1 and dir1, containing file2
-        # TODO
-        #self.assertTrue(  isdir( join(myproj_dir, 'myproj') ) )
+        # ...inside of which is default template files and dirs
         self.assertTrue( isfile( join(myproj_dir, 'CHANGES.txt') ) )
-        # TODO
-        #self.assertTrue(  isdir( join(myproj_dir, 'myproj.bat') ) )
         self.assertTrue( isfile( join(myproj_dir, 'LICENSE.txt') ) )
         self.assertTrue( isfile( join(myproj_dir, 'Makefile') ) )
         self.assertTrue( isfile( join(myproj_dir, 'README.txt') ) )
         self.assertTrue( isfile( join(myproj_dir, 'setup.py') ) )
         self.assertTrue( isfile( join(myproj_dir, 'TODO.txt') ) )
+
+        # TODO
+        # also, template tags have been replaced in filenames
+        #self.assertTrue(  isdir( join(myproj_dir, 'myproj') ) )
+        #self.assertTrue(  isdir( join(myproj_dir, 'myproj.bat') ) )
 
 
     def assert_genesis_gives_error(self, *args, expected_err=None):
