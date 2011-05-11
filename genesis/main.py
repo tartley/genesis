@@ -1,6 +1,6 @@
 
 from os import listdir, mkdir, remove, walk
-from os.path import abspath, exists, expanduser, isdir, isfile, join, sep
+from os.path import abspath, exists, isdir, isfile, join, sep
 from sys import exit, stderr
 
 from . import paths
@@ -61,12 +61,11 @@ def create_project(options):
         return content
 
     create_dest_dir(options.name, options.force)
-    copy_tree( join(paths.USER_CONFIG, options.template), options.name, transform)
+    copy_tree(options.template, options.name, transform)
 
 
 def main():
-    options = parse_args()
-    create_project(options)
+    create_project(parse_args())
 
 
 if __name__ == '__main__':
