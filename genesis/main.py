@@ -46,11 +46,11 @@ def copy_tree(source, dest, transform):
     for dirname, subdirs, files in walk(source):
         relative_path = get_relative_path(dirname, source)
         for subdir in subdirs:
-            make_dir(join(dest, relative_path, subdir))
+            make_dir(join(dest, transform(relative_path), transform(subdir)))
         for filename in files:
             copy_file(
                 join(dirname, filename),
-                join(dest, relative_path, filename)
+                join(dest, transform(relative_path), transform(filename))
             )
 
 

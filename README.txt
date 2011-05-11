@@ -42,9 +42,14 @@ containing your new project. <Options> may include any of:
         Use C as your config dir instead of ~/.genesis. Used for testing
         Genesis itself during development.
 
+All of the above also define name-value pairs which are used to search-and-
+replace tags within the copied template. For example, a tag in the template
+of the form 'G{template}' will be replaced by the value of the template
+argument in the output files.
+
 In addition, the command line can include any number of space-separated
-``name=value`` pairs, which are used to search-and-replace tags of the form
-``G{name}`` within the copied template.
+``name=value`` pairs, which are also used to search-and-replace tags in the
+template.
 
 For example, ``author_email=me@example.com`` on the command-line will cause
 ``G{author_email}`` anywhere in the template to be replaced with
@@ -160,8 +165,6 @@ Now you need only issue the command-line::
 
 Known Issues
 ------------
-
-Template tags in file and directory names should be replaced.
 
 Undefined tags should be reported to the user.
 

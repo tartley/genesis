@@ -47,7 +47,7 @@ class Basic_operation(TestCase):
         )
         process = Popen(
             [ script ] +
-            [ '--config-dir={}'.format(join(TEST_DIR, TEST_CONFIG)) ] +
+            [ '--config-dir=' + join(TEST_DIR, TEST_CONFIG) ] +
             list(params),
             stdout=PIPE,
             stderr=PIPE,
@@ -87,11 +87,6 @@ class Basic_operation(TestCase):
         self.assertTrue( isfile( join(myproj_dir, 'setup.py') ) )
         self.assertTrue( isfile( join(myproj_dir, 'TODO.txt') ) )
 
-        # TODO
-        # also, template tags have been replaced in filenames
-        #self.assertTrue(  isdir( join(myproj_dir, 'myproj') ) )
-        #self.assertTrue(  isdir( join(myproj_dir, 'myproj.bat') ) )
-
 
     def assert_genesis_gives_error(self, *args, expected_err=None):
         exitval, out, err = self.run_genesis(*args)
@@ -105,7 +100,7 @@ class Basic_operation(TestCase):
 
     def test_template_should_be_copied_and_tags_expanded(self):
         self.assert_genesis_runs_ok(
-            '--template={}'.format(TEST_TEMPLATE),
+            '--template=' + TEST_TEMPLATE,
             'myproj',
             'author=Jonathan Hartley',
         )
@@ -144,9 +139,8 @@ class Basic_operation(TestCase):
     def test_existing_empty_dir_is_filled(self):
         mkdir('myproj')
         self.assert_genesis_runs_ok(
-            '--template={}'.format(TEST_TEMPLATE),
+            '--template=' + TEST_TEMPLATE,
             'myproj',
-            'author=Jonathan Hartley',
         )
         self.assert_test_template_files_created()
 
@@ -156,9 +150,8 @@ class Basic_operation(TestCase):
         with open(join('myproj', 'somefile'), 'w') as fp:
             pass
         self.assert_genesis_gives_error(
-            '--template={}'.format(TEST_TEMPLATE),
+            '--template=' + TEST_TEMPLATE,
             'myproj',
-            'author=Jonathan Hartley',
             expected_err="Output directory 'myproj' is not empty, use --force",
         )
 
@@ -168,16 +161,15 @@ class Basic_operation(TestCase):
         with open(join('myproj', 'somefile'), 'w') as fp:
             pass
         self.assert_genesis_runs_ok(
-            '--template={}'.format(TEST_TEMPLATE),
+            '--template=' + TEST_TEMPLATE,
             '--force',
             'myproj',
-            'author=Jonathan Hartley',
         )
 
 
     def test_missing_template_should_raise_error(self):
         self.assert_genesis_gives_error(
-            '--template={}'.format('non_existant'),
+            '--template=non_existant',
             'myproj',
             expected_err="Template 'non_existant' not found in {}.".format(
                 paths.tilde_encode(join(TEST_DIR, TEST_CONFIG))
@@ -188,9 +180,17 @@ class Basic_operation(TestCase):
     def test_default_template_read_from_package_if_not_in_config_dir(self):
         self.assert_genesis_runs_ok(
             'myproj',
-            'author=Jonathan Hartley',
         )
         self.assert_default_template_files_created()
+
+
+    def test_tags_in_filenames_should_be_replaced(self):
+        self.assert_genesis_runs_ok(
+            '--template=' + TEST_TEMPLATE,
+            'myproj',
+        )
+        self.assertTrue(  isdir( join('myproj', 'myproj') ) )
+        self.assertTrue( isfile( join('myproj', 'myproj', 'myproj.bat') ) )
 
 
     def DONTtest_list_unreplaced_tags(self):
