@@ -171,6 +171,8 @@ Undefined tag values are not reported.
 
 Not actually tested on Ubuntu
 
+Sdist contains a dist directory. Is this required?
+
 No binaries are available, which makes Genesis unusable unless you use Python
 3.2.
 

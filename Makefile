@@ -8,7 +8,6 @@
 
 NAME := genesis
 RELEASE := $(shell python -c "from ${NAME} import RELEASE; print(RELEASE)")
-SCRIPT := $(shell python -c "from setup import SCRIPT; print(SCRIPT)")
 
 
 clean:
@@ -25,15 +24,17 @@ tags:
 # runsnake is a GUI profile visualiser, very useful.
 # http://www.vrplumber.com/programming/runsnakerun/
 profile:
-	python -O -m cProfile -o profile.out ${SCRIPT}
+	python -O -m cProfile -o profile.out ${NAME}
 	runsnake profile.out
 .PHONY: profile
 
 
-test: tests
 tests:
 	python -m unittest discover -v .
 .PHONY: tests
+
+test: tests
+.PHONY: test
 
 
 sdist:
@@ -45,14 +46,14 @@ sdist:
 
 register:
 	rm -rf dist/${NAME}-${RELEASE}.* build
-	python setup.py --quiet sdist register
+	python setup.py --quiet register
 	rm -rf ${NAME}.egg-info
 .PHONY: register
 
 
 upload:
 	rm -rf dist/${NAME}-${RELEASE}.* build
-	python setup.py --quiet sdist register upload
+	python setup.py --quiet sdist upload
 	rm -rf ${NAME}.egg-info
 .PHONY: upload
 

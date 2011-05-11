@@ -8,9 +8,6 @@ import sys
 NAME = 'genesis'
 from genesis import RELEASE
 
-SCRIPT = None
-CONSOLE = False
-
 
 def read_description(filename):
     '''
@@ -53,10 +50,11 @@ def get_sdist_config():
         license='New BSD',
         author='Jonathan Hartley',
         author_email='tartley@tartley.com',
-        keywords='Python project template',
-        packages=find_packages(exclude=('*.tests',)),
+        keywords='Generate Python project template',
+        packages=find_packages(), #exclude=('*.tests',)),
         data_files=None, #get_data_files('share/doc/' + NAME, 'docs/html'),
         package_data={ NAME: get_package_data('config') },
+        scripts=['genesis.bat', 'genesis-script.py'],
         # see classifiers http://pypi.python.org/pypi?:action=list_classifiers
         classifiers=[
             'Development Status :: 3 - Alpha',
