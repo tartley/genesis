@@ -29,31 +29,27 @@ test: tests
 .PHONY: test
 
 
-sdist:
+sdist: clean
 	rm -rf dist/${NAME}-${RELEASE}.* build
 	python setup.py --quiet sdist
-	rm -rf ${NAME}.egg-info
 .PHONY: sdist
 
 
 register:
 	rm -rf dist/${NAME}-${RELEASE}.* build
 	python setup.py --quiet register
-	rm -rf ${NAME}.egg-info
 .PHONY: register
 
 
-upload:
+upload: clean
 	rm -rf dist/${NAME}-${RELEASE}.* build
 	python setup.py --quiet sdist upload
-	rm -rf ${NAME}.egg-info
 .PHONY: upload
 
 
 py2exe:
 	rm -rf dist/${NAME}-${RELEASE}.* build
 	python setup.py --quiet py2exe
-	rm -rf ${NAME}.egg-info
 .PHONY: py2exe
 
 
