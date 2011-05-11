@@ -58,7 +58,7 @@ class Basic_operation(TestCase):
 
     def assert_genesis_runs(self, *args, err=None, exit=0):
         exitval, outval, errval = self.run_genesis(*args)
-        if err:
+        if err is not None:
             self.assertIn(bytes(err, 'utf-8'), errval, str_decode(errval))
         else:
             self.assertEqual(errval, bytes('', 'utf-8'), str_decode(errval))
@@ -177,7 +177,7 @@ class Basic_operation(TestCase):
     def test_default_template_read_from_package_if_not_in_config_dir(self):
         self.assert_genesis_runs(
             'myproj',
-            err='Warning: Undefined tags in template:'
+            err='' # ignore error text, best left for separate test
         )
         self.assert_default_template_files_created()
 
@@ -190,6 +190,14 @@ class Basic_operation(TestCase):
         )
         self.assertTrue(  isdir( join('myproj', 'myproj') ) )
         self.assertTrue( isfile( join('myproj', 'myproj', 'myproj.bat') ) )
+
+
+    def test_undefined_tags_in_template_should_produce_warning(self):
+        self.assert_genesis_runs(
+            '--template=' + TEST_TEMPLATE,
+            'myproj',
+            err='Warning: Undefined tags in template:\n  author',
+        )
 
 
     def DONTtest_list_unreplaced_tags(self):

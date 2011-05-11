@@ -1,7 +1,8 @@
 
+import re
 from os import listdir, mkdir, remove, walk
 from os.path import abspath, exists, isdir, isfile, join, sep
-from sys import exit, stderr
+import sys
 
 from . import paths
 from .options import parse_args
@@ -13,9 +14,9 @@ def create_dest_dir(name, force):
     elif listdir(name) and not force:
         print(
             "Output directory '{}' is not empty, use --force".format(name),
-            file=stderr
+            file=sys.stderr
         )
-        exit(2)
+        sys.exit(2)
 
 
 def copy_tree(source, dest, transform):
@@ -25,9 +26,9 @@ def copy_tree(source, dest, transform):
 
     def make_dir(name):
         '''
-        if name is a dir, do nothing.
+        mkdir name. Do nothing if such a dir already exists.
         If name is a file, remove it and create a dir instead.
-        If name does not exist, create a dir.
+        Does not handle creation of parent dirs.
         '''
         name = abspath(name)
         if isfile(name):
@@ -55,13 +56,27 @@ def copy_tree(source, dest, transform):
 
 
 def create_project(options):
-    def transform(content):
-        for name, value in vars(options).items():
-            content = content.replace('G{' + name + '}', str(value))
-        return content
+    regex = re.compile('G\{(.+?)\}')
+    unmatched_tags = set()
 
-    create_dest_dir(options.name, options.force)
-    copy_tree(options.template, options.name, transform)
+    def replace_tag(match):
+        name = match.group(1)
+        if name in options:
+            return options[match.group(1)]
+        else:
+            unmatched_tags.add(name)
+            return None
+
+    def transform(content):
+        return regex.sub(replace_tag, content)
+
+    create_dest_dir(options['name'], options['force'])
+    copy_tree(options['template'], options['name'], transform)
+
+    if unmatched_tags:
+        print('Warning: Undefined tags in template:', file=sys.stderr)
+        for tag in unmatched_tags:
+            print('  ' + tag, file=sys.stderr)
 
 
 def main():
