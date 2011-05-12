@@ -169,8 +169,6 @@ Now you need only issue the command-line::
 Known Issues
 ------------
 
-Undefined tags should be reported to the user.
-
 --license not implemented. Assumes your project is BSD license.
 Should barf on unknown license choices. User should be able to add own
 licenses.
@@ -180,17 +178,39 @@ licenses.
 Alternative implementation: Before search-and-replace, we choose a license file
 based on --license.
 
-Auto generated tags: G{year}, G{date}
-
 Not actually tested on Ubuntu
 
 No binaries are available, which makes Genesis unusable unless you you have
 Python 3.2 foremost on your path.
 
+Default template setup.py does not put data_files into the manifest.in
+
+Should allow user to interactively supply values for undefined tags.
+
+Default template should produce sdist, register and upload to PyPI
+
+Default template should produce a Windows binary (if user is on Windows)
+
+
 Not for v1 release:
 ...................
 
-Default template setup.py does not put data_files into the manifest.in
+Default template should work on Python2.x as well as 3.x
+
+Default template should produce a Mac binary (if user is on a Mac)
+
+Default template should produce a Linux binary (if user is on Linux)
+
+Default template should include documentation.
+
+Default template should upload docs to ReadThedocs
+
+Should preserve permissions on template files.
+
+Should override argparse's default 'usage' string, to show name=value pairs
+explicitly.
+
+Auto generated tags: G{year}, G{date}
 
 Don't know what to use for project url:
 Explicit G{url} tag requires setting on command line for every project, or else
@@ -201,15 +221,6 @@ But presumably this pattern is not applicable to many projects.
 How about the not-quite-as clever::
     url='G{url_root}/G{name}',
 Final alternative is to leave blank. :-(
-
-Should allow user to interactively supply values for undefined tags.
-
-Default template should include documentation.
-
-Doesn't preserve permissions on template files.
-
-Sdist contains a dist directory. Is this required? (Simply do a make clean
-before make sdist?)
 
 The config file is parsed using 'eval'. I'm not smart enough to know whether
 this is a security problem.
