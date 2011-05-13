@@ -169,6 +169,13 @@ Now you need only issue the command-line::
 Known Issues
 ------------
 
+Default template should be a console app which supports --version and --help
+
+Default template should produce sdist, register and upload to PyPI
+
+Default template should be able to produce a Windows binary with py2exe
+(if user is on Windows)
+
 --license not implemented. Assumes your project is BSD license.
 Should barf on unknown license choices. User should be able to add own
 licenses.
@@ -187,14 +194,6 @@ Default template setup.py does not put data_files into the manifest.in
 
 Should allow user to interactively supply values for undefined tags.
 
-Default template should produce sdist, register and upload to PyPI
-
-Default template should produce a Windows binary (if user is on Windows)
-
-
-Not for v1 release:
-...................
-
 Default template should work on Python2.x as well as 3.x
 
 Default template should produce a Mac binary (if user is on a Mac)
@@ -210,7 +209,9 @@ Should preserve permissions on template files.
 Should override argparse's default 'usage' string, to show name=value pairs
 explicitly.
 
-Auto generated tags: G{year}, G{date}
+Auto generated tags:
+    G{year}, for use in LICENSE.txt
+    G{date}, for use in CHANGES.txt
 
 Don't know what to use for project url:
 Explicit G{url} tag requires setting on command line for every project, or else
