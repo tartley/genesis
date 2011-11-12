@@ -7,7 +7,9 @@
 
 
 NAME := genesis
-RELEASE := $(shell python -c "from ${NAME} import RELEASE; print(RELEASE)")
+SOURCE := src
+RELEASE := $(shell python -c "from ${SOURCE} import RELEASE; print(RELEASE)")
+PYTHON := python3
 
 
 clean:
@@ -17,46 +19,43 @@ clean:
 
 
 tags:
-	ctags -R ${NAME}
+	ctags -R ${SOURCE}
 .PHONY: tags
 
 
-tests:
-	python -m unittest discover -v .
-.PHONY: tests
-
-test: tests
+test:
+	${PYTHON} -m unittest discover -v .
 .PHONY: test
 
 
 sdist: clean
 	rm -rf dist/${NAME}-${RELEASE}.* build
-	python setup.py --quiet sdist
+	${PYTHON} setup.py --quiet sdist
 .PHONY: sdist
 
 
 register:
 	rm -rf dist/${NAME}-${RELEASE}.* build
-	python setup.py --quiet register
+	${PYTHON} setup.py --quiet register
 .PHONY: register
 
 
 upload: clean
 	rm -rf dist/${NAME}-${RELEASE}.* build
-	python setup.py --quiet sdist upload
+	${PYTHON} setup.py --quiet sdist upload
 .PHONY: upload
 
 
 py2exe:
 	rm -rf dist/${NAME}-${RELEASE}.* build
-	python setup.py --quiet py2exe
+	${PYTHON} setup.py --quiet py2exe
 .PHONY: py2exe
 
 
 # runsnake is a GUI visualiser for the output of cProfile
 # http://www.vrplumber.com/programming/runsnakerun/
 profile:
-	python -O -m cProfile -o profile.out ${NAME}
+	${PYTHON} -O -m cProfile -o profile.out ${NAME}
 	runsnake profile.out
 .PHONY: profile
 
