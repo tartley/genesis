@@ -123,4 +123,3 @@ def parse_args():
     result['template']= locate_template(result['template'])
 
     return result
-
