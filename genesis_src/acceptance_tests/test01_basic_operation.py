@@ -23,8 +23,10 @@ def read_file(filename):
     with open(filename) as fp:
         return fp.read()
 
+
 def str_decode(s):
     return bytes(s).decode('unicode_escape')
+
 
 def get_script():
     return SCRIPT_WIN if platform.startswith('win') else SCRIPT
