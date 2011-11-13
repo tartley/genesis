@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# run the Python script stored in same dir as this file
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+python3 $DIR/genesis-script.py $*
+

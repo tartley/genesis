@@ -48,8 +48,6 @@ class Basic_operation(TestCase):
         script = normpath(
             join(dirname(__file__), '..', '..', get_script())
         )
-        print(join(self.orig_cwd, script))
-
         process = Popen(
             [ join(self.orig_cwd, script) ] +
             [ '--config-dir=' + join(TEST_DIR, TEST_CONFIG) ] +
