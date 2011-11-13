@@ -1,8 +1,8 @@
-from os import chdir, getcwd, mkdir
+from os import chdir, environ, getcwd, mkdir
 from os.path import (
     dirname, exists, isdir, isfile, join, normpath
 )
-from shutil import rmtree
+from shutil import copytree, rmtree
 from subprocess import PIPE, Popen
 from sys import platform
 from tempfile import mkdtemp
@@ -16,6 +16,8 @@ SCRIPT_WIN = SCRIPT + '.bat'
 
 TEST_TEMPLATE = 'test_template'
 TEST_DIR = dirname(__file__)
+FAKE_HOME = join(TEST_DIR, 'fake_home')
+
 TEST_CONFIG = 'fake_config'
 
 
@@ -32,7 +34,7 @@ def get_script():
     return SCRIPT_WIN if platform.startswith('win') else SCRIPT
 
 
-class Basic_operation(TestCase):
+class GenesisSystemTest(TestCase):
 
     def setUp(self):
         self.temp_dir = mkdtemp()
@@ -50,10 +52,15 @@ class Basic_operation(TestCase):
         script = normpath(
             join(dirname(__file__), '..', '..', get_script())
         )
+
+        env_with_fake_home = environ.copy()
+        env_with_fake_home['HOME'] = FAKE_HOME
+
         process = Popen(
-            [script] + params + ['--config-dir=' + join(TEST_DIR, TEST_CONFIG)],
+            [script] + params,
             stdout=PIPE,
             stderr=PIPE,
+            env=env_with_fake_home,
         )
         out, err = process.communicate()
         return process.returncode, out, err
@@ -164,9 +171,7 @@ class Basic_operation(TestCase):
     def test_missing_template_should_raise_error(self):
         self.assert_genesis_runs(
             ['--template=non_existant', 'myproj'],
-            err="Template 'non_existant' not found in {}.".format(
-                paths.tilde_encode(join(TEST_DIR, TEST_CONFIG))
-            ),
+            err="Template 'non_existant' not found in ~/.genesis.",
             exit=2,
         )
 
@@ -192,8 +197,4 @@ class Basic_operation(TestCase):
             ['--template=' + TEST_TEMPLATE, 'myproj'],
             err='Warning: Undefined tags in template:\n  author',
         )
-
-
-    def DONTtest_list_unreplaced_tags(self):
-        self.fail()
 

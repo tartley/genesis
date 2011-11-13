@@ -1,7 +1,8 @@
+from os import environ
+from os.path import dirname, join, sep
 
-from os.path import dirname, expanduser, join, sep
 
-HOME = expanduser('~')
+HOME = environ['HOME']
 USER_CONFIG = join(HOME, '.genesis')
 
 SOURCE = dirname(__file__)
@@ -9,7 +10,6 @@ PACKAGE_CONFIG = join(SOURCE, 'config')
 
 
 def tilde_encode(filename):
-    home = expanduser('~')
-    if filename.startswith(home):
-        return '~' + sep + filename[len(home)+1:]
+    if filename.startswith(HOME):
+        return '~' + sep + filename[len(HOME)+1:]
 

@@ -38,9 +38,6 @@ containing your new project. <Options> may include any of:
     --force
         Required to create a new project in a non-empty directory, overwriting
         any files or dirs with the same name as template content.
-    --config-dir=C
-        Use C as your config dir instead of ~/.genesis. Used for testing
-        Genesis itself during development.
 
 All of the above also define name-value pairs which are used to search-and-
 replace tags within the copied template. For example, a tag in the template

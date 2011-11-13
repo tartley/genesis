@@ -23,10 +23,6 @@ def create_parser():
     parser.add_argument('--force', action='store_true', default=False,
         help='Force writing to an existing non-empty output dir.'
     )
-    parser.add_argument('--config-dir',
-        help='Genesis config directory, defaults to ~/.genesis. '
-            'This option is used for testing Genesis itself.'
-    )
     parser.add_argument('name', nargs='+',
         help='Name of your new project, followed by optional space-separated '
             'name=value pairs.'
@@ -114,10 +110,6 @@ def parse_args():
     opts_cmdline = parser.parse_args()
     opts_cmdline.name, taglist = extract_name(opts_cmdline, parser)
     opts_tags = tags_to_dict(taglist)
-
-    # command-line can override location of config file
-    if opts_cmdline.config_dir:
-        paths.USER_CONFIG = opts_cmdline.config_dir
 
     opts_file = parse_config_file(join(paths.USER_CONFIG, CONFIG_FILENAME))
 
