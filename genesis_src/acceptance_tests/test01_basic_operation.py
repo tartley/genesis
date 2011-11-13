@@ -96,7 +96,7 @@ class Basic_operation(TestCase):
 
     def test_template_should_be_copied_and_tags_expanded(self):
         self.assert_genesis_runs(
-            '--template=' + TEST_TEMPLATE + ' myproj author=Jonathan Hartley',
+            '--template=' + TEST_TEMPLATE + ' myproj author=JonathanHartley',
         )
         self.assert_test_template_files_created()
 

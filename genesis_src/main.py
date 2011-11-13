@@ -14,7 +14,7 @@ def create_dest_dir(name, force):
     elif listdir(name) and not force:
         print(
             "Output directory '{}' is not empty, use --force".format(name),
-            file=sys.stderr
+            file=sys.stderr,
         )
         sys.exit(2)
 
@@ -81,8 +81,4 @@ def create_project(options):
 
 def main():
     create_project(parse_args())
-
-
-if __name__ == '__main__':
-    main()
 
