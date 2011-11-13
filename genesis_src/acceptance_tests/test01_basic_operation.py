@@ -44,14 +44,14 @@ class Basic_operation(TestCase):
         rmtree(self.temp_dir)
 
 
-    def run_genesis(self, params):
+    def run_genesis(self, params=None):
+        if params is None:
+            params = []
         script = normpath(
             join(dirname(__file__), '..', '..', get_script())
         )
         process = Popen(
-            [ join(self.orig_cwd, script) ] +
-            [ '--config-dir=' + join(TEST_DIR, TEST_CONFIG) ] +
-            params.split(),
+            [script] + params + ['--config-dir=' + join(TEST_DIR, TEST_CONFIG)],
             stdout=PIPE,
             stderr=PIPE,
         )
@@ -59,7 +59,7 @@ class Basic_operation(TestCase):
         return process.returncode, out, err
 
 
-    def assert_genesis_runs(self, params='', err=None, exit=0):
+    def assert_genesis_runs(self, params=None, err=None, exit=0):
         exitval, outval, errval = self.run_genesis(params)
         if err is not None:
             self.assertIn(bytes(err, 'utf-8'), errval)
@@ -96,7 +96,7 @@ class Basic_operation(TestCase):
 
     def test_template_should_be_copied_and_tags_expanded(self):
         self.assert_genesis_runs(
-            '--template=' + TEST_TEMPLATE + ' myproj author=JonathanHartley',
+            ['--template=' + TEST_TEMPLATE, 'myproj', 'author=JonathanHartley']
         )
         self.assert_test_template_files_created()
 
@@ -134,7 +134,7 @@ class Basic_operation(TestCase):
         mkdir('myproj')
         try:
             self.assert_genesis_runs(
-                '--template=' + TEST_TEMPLATE + ' myproj author=JonathanHartley',
+                ['--template=' + TEST_TEMPLATE, 'myproj', 'author=JonathanHartley']
             )
             self.assert_test_template_files_created()
         finally:
@@ -146,7 +146,7 @@ class Basic_operation(TestCase):
         with open(join('myproj', 'somefile'), 'w'):
             pass
         self.assert_genesis_runs(
-            '--template=' + TEST_TEMPLATE + ' myproj',
+            ['--template=' + TEST_TEMPLATE, 'myproj'],
             err="Output directory 'myproj' is not empty, use --force",
             exit=2,
         )
@@ -157,13 +157,13 @@ class Basic_operation(TestCase):
         with open(join('myproj', 'somefile'), 'w'):
             pass
         self.assert_genesis_runs(
-            '--template=' + TEST_TEMPLATE + ' --force myproj author=JonathanHartley',
+            ['--template=' + TEST_TEMPLATE, '--force', 'myproj', 'author=JonathanHartley']
         )
 
 
     def test_missing_template_should_raise_error(self):
         self.assert_genesis_runs(
-            '--template=non_existant myproj',
+            ['--template=non_existant', 'myproj'],
             err="Template 'non_existant' not found in {}.".format(
                 paths.tilde_encode(join(TEST_DIR, TEST_CONFIG))
             ),
@@ -173,15 +173,15 @@ class Basic_operation(TestCase):
 
     def test_default_template_read_from_package_if_not_in_config_dir(self):
         self.assert_genesis_runs(
-            'myproj',
-            err='' # ignore error text, best left for separate test
+            ['myproj'],
+            err='' # ignore error text, best left for a separate test
         )
         self.assert_default_template_files_created()
 
 
     def test_tags_in_filenames_should_be_replaced(self):
         self.assert_genesis_runs(
-            '--template=' + TEST_TEMPLATE + ' myproj author=JonathanHartley',
+            ['--template=' + TEST_TEMPLATE, 'myproj', 'author=JonathanHartley']
         )
         self.assertTrue(  isdir( join('myproj', 'myproj') ) )
         self.assertTrue( isfile( join('myproj', 'myproj', 'myproj.bat') ) )
@@ -189,7 +189,7 @@ class Basic_operation(TestCase):
 
     def test_undefined_tags_in_template_should_produce_warning(self):
         self.assert_genesis_runs(
-            '--template=' + TEST_TEMPLATE + ' myproj',
+            ['--template=' + TEST_TEMPLATE, 'myproj'],
             err='Warning: Undefined tags in template:\n  author',
         )
 
