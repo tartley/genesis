@@ -1,3 +1,3 @@
-from genesis.main import main
+from genesis_src.main import main
 main()
 

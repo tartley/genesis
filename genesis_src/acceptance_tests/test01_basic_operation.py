@@ -1,18 +1,19 @@
-
 from os import chdir, getcwd, mkdir
 from os.path import (
     dirname, exists, expanduser, isdir, isfile, join, normpath, relpath
 )
 from shutil import copytree, rmtree
 from subprocess import PIPE, Popen
-from sys import executable
+from sys import executable, platform
 from tempfile import mkdtemp
 from unittest import TestCase
 
-from genesis import paths
+from genesis_src import paths
 
 
-SCRIPT = 'genesis.bat'
+SCRIPT = 'genesis'
+SCRIPT_WIN = SCRIPT + '.bat'
+
 TEST_TEMPLATE = 'test_template'
 TEST_DIR = dirname(__file__)
 TEST_CONFIG = 'fake_config'
@@ -25,6 +26,9 @@ def read_file(filename):
 def str_decode(s):
     return bytes(s).decode('unicode_escape')
 
+def get_script():
+    return SCRIPT_WIN if platform.startswith('win') else SCRIPT
+
 
 class Basic_operation(TestCase):
 
@@ -34,7 +38,6 @@ class Basic_operation(TestCase):
         self.orig_cwd = getcwd()
         chdir(self.temp_dir)
 
-
     def tearDown(self):
         # cd back to original cwd and rm the temp directory
         chdir(self.orig_cwd)
@@ -43,10 +46,12 @@ class Basic_operation(TestCase):
 
     def run_genesis(self, *params):
         script = normpath(
-            join(dirname(__file__), '..', '..', SCRIPT)
+            join(dirname(__file__), '..', '..', get_script())
         )
+        print(join(self.orig_cwd, script))
+
         process = Popen(
-            [ script ] +
+            [ join(self.orig_cwd, script) ] +
             [ '--config-dir=' + join(TEST_DIR, TEST_CONFIG) ] +
             list(params),
             stdout=PIPE,
@@ -59,9 +64,9 @@ class Basic_operation(TestCase):
     def assert_genesis_runs(self, *args, err=None, exit=0):
         exitval, outval, errval = self.run_genesis(*args)
         if err is not None:
-            self.assertIn(bytes(err, 'utf-8'), errval, str_decode(errval))
+            self.assertIn(bytes(err, 'utf-8'), errval)
         else:
-            self.assertEqual(errval, bytes('', 'utf-8'), str_decode(errval))
+            self.assertEqual(errval, bytes('', 'utf-8'))
         self.assertEqual(outval, b'', str_decode(outval))
         self.assertEqual(exitval, exit)
 
@@ -95,7 +100,7 @@ class Basic_operation(TestCase):
         self.assert_genesis_runs(
             '--template=' + TEST_TEMPLATE,
             'myproj',
-            'author=Jonathan Hartley',
+            'author=JonathanHartley',
         )
         self.assert_test_template_files_created()
 
@@ -107,7 +112,7 @@ class Basic_operation(TestCase):
             read_file(join(myproj_dir, 'file1')),
             (
                 'Project name: myproj\n'
-                'Author name: Jonathan Hartley\n'
+                'Author name: JonathanHartley\n'
                 '\n'
             )
         )
@@ -131,12 +136,15 @@ class Basic_operation(TestCase):
 
     def test_existing_empty_dir_is_filled(self):
         mkdir('myproj')
-        self.assert_genesis_runs(
-            '--template=' + TEST_TEMPLATE,
-            'myproj',
-            'author=Jonathan Hartley',
-        )
-        self.assert_test_template_files_created()
+        try:
+            self.assert_genesis_runs(
+                '--template=' + TEST_TEMPLATE,
+                'myproj',
+                'author=JonathanHartley',
+            )
+            self.assert_test_template_files_created()
+        finally:
+            rmtree('myproj')
 
 
     def test_existing_full_dir_should_raise_an_error(self):
@@ -159,7 +167,7 @@ class Basic_operation(TestCase):
             '--template=' + TEST_TEMPLATE,
             '--force',
             'myproj',
-            'author=Jonathan Hartley',
+            'author=JonathanHartley',
         )
 
 
@@ -186,7 +194,7 @@ class Basic_operation(TestCase):
         self.assert_genesis_runs(
             '--template=' + TEST_TEMPLATE,
             'myproj',
-            'author=Jonathan Hartley',
+            'author=JonathanHartley',
         )
         self.assertTrue(  isdir( join('myproj', 'myproj') ) )
         self.assertTrue( isfile( join('myproj', 'myproj', 'myproj.bat') ) )

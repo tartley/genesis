@@ -7,7 +7,7 @@
 
 
 NAME := genesis
-SOURCE := src
+SOURCE := ${NAME}_src
 RELEASE := $(shell python -c "from ${SOURCE} import RELEASE; print(RELEASE)")
 PYTHON := python3
 
