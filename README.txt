@@ -1,6 +1,8 @@
 Genesis is a command-line tool to create new Python projects.
 
-PROJECT IS DELETED. It is a godawful waste of time which should never have been created. Instead use a single sed command, perhaps as in the tiny Bash script that is: https://github.com/tartley/genesis3
+PROJECT IS DELETED. It is a godawful waste of time which should never
+have been created. Instead use a single sed command, perhaps as in the
+tiny Bash script that is: https://github.com/tartley/genesis3
 
 When invoked, it copies files and directories from a project template,
 doing several search-and-replace operations on the copied files to insert
